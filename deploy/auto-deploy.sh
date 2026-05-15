@@ -395,8 +395,8 @@ MYSQL_USER=huifu
 REDIS_HOST=localhost
 REDIS_PORT=6379
 MINIO_HOST=localhost
-MYSQL_ROOT_PASSWORD=$(openssl rand -base64 24)
-MYSQL_PASSWORD=$(openssl rand -base64 24)
+MYSQL_ROOT_PASSWORD=nishi250
+MYSQL_PASSWORD=nishi250
 REDIS_PASSWORD=$(openssl rand -base64 16)
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=$(openssl rand -base64 24)
@@ -500,14 +500,6 @@ init_database() {
 # ============================================================
 # 6. 配置部署
 # ============================================================
-deploy_nginx_conf() {
-    info "部署 Nginx 配置..."
-    cp "${NGINX_CONF_SRC}" /etc/nginx/nginx.conf
-    nginx -t || { err "Nginx 配置语法错误"; return 1; }
-    systemctl reload nginx 2>/dev/null || systemctl start nginx 2>/dev/null || true
-    log "Nginx 配置已更新"
-}
-
 deploy_systemd_units() {
     info "部署 Systemd 配置..."
     if [ -f "${SYSTEMD_DIR}/huifu-api.service" ]; then
@@ -555,11 +547,7 @@ start_services() {
         wait_for_port 127.0.0.1 9000 15 "MinIO" || true
     fi
 
-    # 4. Nginx
-    systemctl enable --now nginx 2>/dev/null || true
-    sleep 1
-
-    # 5. API
+    # 4. API
     info "启动 API 服务..."
     chown -R huifu:huifu "${PROJECT_ROOT}" 2>/dev/null || true
     chown -R huifu:huifu "${LOG_DIR}" 2>/dev/null || true
@@ -710,7 +698,6 @@ main() {
     fi
 
     # ---- 部署配置 ----
-    deploy_nginx_conf
     deploy_systemd_units
 
     # ---- 数据库初始化 ----
