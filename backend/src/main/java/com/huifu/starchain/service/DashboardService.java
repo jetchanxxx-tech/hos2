@@ -92,15 +92,30 @@ public class DashboardService {
     public List<Map<String, Object>> getRecentActivity() {
         List<Map<String, Object>> activities = new ArrayList<>();
         var logs = auditLogRepo.findRecent(PageRequest.of(0, 20));
+        var loggedUsers = new java.util.HashSet<Long>();
         for (var log : logs.getContent()) {
             Map<String, Object> entry = new LinkedHashMap<>();
-            entry.put("action", log.getAction());
-            entry.put("resourceType", log.getResourceType());
-            entry.put("time", log.getCreatedAt() != null ? log.getCreatedAt().toString() : "");
-            entry.put("result", log.getResult());
-            entry.put("userId", log.getUserId());
+            // 前端的 OperationalDashboard 期望这些字段
+            // 从 AuditLog 翻译为可读的 activity feed
+            String actor = "用户#" + (log.getUserId() != null ? log.getUserId() : "系统");
+            if (log.getUserId() != null && !loggedUsers.contains(log.getUserId())) {
+                try {
+                    var u = userRepo.findById(log.getUserId());
+                    if (u.isPresent()) actor = u.get().getNameMasked();
+                } catch (Exception ignored) {}
+                loggedUsers.add(log.getUserId());
+            }
+            String action = log.getAction() != null ? log.getAction() : "";
+            String target = log.getResourceType() != null ? log.getResourceType() : "";
+            String resourceId = log.getResourceId() != null ? "/" + log.getResourceId() : "";
+            entry.put("actor", actor);
+            entry.put("action", action);
+            entry.put("target", target + resourceId);
+            entry.put("time", log.getCreatedAt() != null ? log.getCreatedAt().toString().replace("T", " ") : "");
+            entry.put("type", log.getResourceType() != null ? log.getResourceType().toLowerCase() : "system");
             activities.add(entry);
         }
+        // 如果没有审计日志，返回空（前端会显示空列表）
         return activities;
     }
 

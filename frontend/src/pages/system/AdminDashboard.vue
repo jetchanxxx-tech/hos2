@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { adminApi, dashboardApi } from '@/api'
+import { adminApi, dashboardApi, pkgApi } from '@/api'
 import KpiCard from '@/components/KpiCard.vue'
 
 const stats = ref<any>({ totalUsers: 0, activeResidents: 0, butlers: 0 })
@@ -19,7 +19,7 @@ onMounted(async () => {
     dashboardApi.butlerLeaderboard(),
     adminApi.auditLogs(1, 20),
     adminApi.listUsers(1, 50),
-    (await import('@/api')).pkgApi.list(1, 50),
+    pkgApi.list(1, 50),
     adminApi.listKnowledge(1, 50),
   ])
   stats.value = (s as any).data || {}
