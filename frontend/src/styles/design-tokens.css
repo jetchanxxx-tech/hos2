@@ -1,0 +1,84 @@
+/* ============================================================
+   惠福星链 · 设计令牌 · Design Tokens
+   基于 oklch 色彩空间的医疗健康调色板
+   ============================================================ */
+:root {
+  /* 背景与表面 */
+  --bg:         oklch(98.5% 0.003 220);
+  --surface:    oklch(100% 0 0);
+  --surface-alt: oklch(96% 0.004 215);
+
+  /* 前景文字 */
+  --fg:         oklch(18% 0.018 250);
+  --fg-secondary: oklch(44% 0.014 250);
+  --fg-muted:   oklch(65% 0.012 245);
+  --fg-inverse: oklch(100% 0 0);
+
+  /* 边框 */
+  --border:     oklch(89% 0.006 240);
+  --border-light: oklch(93% 0.004 235);
+
+  /* 强调色 — 蓝绿系（医疗信任感） */
+  --accent:           oklch(54% 0.13 180);
+  --accent-light:     oklch(88% 0.04 180);
+  --accent-bg:        oklch(96% 0.015 180);
+  --accent-hover:     oklch(48% 0.14 185);
+
+  /* 语义色彩 */
+  --success:    oklch(58% 0.14 150);
+  --success-bg: oklch(94% 0.04 150);
+  --warning:    oklch(68% 0.15 75);
+  --warning-bg: oklch(95% 0.05 80);
+  --danger:     oklch(52% 0.19 18);
+  --danger-bg:  oklch(95% 0.03 15);
+  --info:       oklch(55% 0.13 240);
+  --info-bg:    oklch(93% 0.03 245);
+
+  /* 品牌暖调 */
+  --coral:      oklch(62% 0.12 35);
+  --coral-bg:   oklch(94% 0.03 35);
+
+  /* 字体栈 */
+  --font-display: 'Inter', 'Söhne', -apple-system, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-body:    -apple-system, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', 'Consolas', ui-monospace, monospace;
+
+  /* 字号阶梯 */
+  --text-xs:   0.75rem;
+  --text-sm:   0.8125rem;
+  --text-base: 0.875rem;
+  --text-md:   1rem;
+  --text-lg:   1.25rem;
+  --text-xl:   1.5rem;
+  --text-2xl:  2rem;
+  --text-3xl:  2.5rem;
+
+  /* 间距 */
+  --space-1:  0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+  --space-4:  1rem; --space-5: 1.25rem; --space-6: 1.5rem;
+  --space-8:  2rem; --space-10: 2.5rem; --space-12: 3rem;
+
+  /* 圆角 */
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px;
+
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.04);
+  --shadow-sm: 0 1px 4px oklch(0% 0 0 / 0.06);
+  --shadow-md: 0 4px 16px oklch(0% 0 0 / 0.08);
+  --shadow-lg: 0 8px 32px oklch(0% 0 0 / 0.10);
+
+  /* 过渡 */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+}
+
+/* 全局重置 */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body); font-size: var(--text-base);
+  line-height: 1.6; color: var(--fg); background: var(--bg);
+  min-height: 100vh;
+}
+a { color: var(--accent); text-decoration: none; }

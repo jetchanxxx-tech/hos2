@@ -1,0 +1,38 @@
+# Claude
+CLAUDE.md
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+backend/target/
+backend/*.jar
+*.class
+*.log
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Deploy
+deploy/.env
+deploy/dist/
+deploy/nginx/ssl/
+
+# Temp
+*.tmp
+/tmp/
+ssh_test.py
+
+# Backup
+/backup/
+*.sql.gz
+nul
+ssh_test.py

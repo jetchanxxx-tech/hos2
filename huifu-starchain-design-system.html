@@ -1,0 +1,1260 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>惠福星链 · 设计系统 &amp; 惠福星盘</title>
+<style>
+/* ============================================================
+   设计令牌 · Design Tokens
+   ============================================================ */
+:root {
+  /* 背景与表面 */
+  --bg:         oklch(98.5% 0.003 220);
+  --surface:    oklch(100% 0 0);
+  --surface-alt: oklch(96% 0.004 215);
+
+  /* 前景文字 */
+  --fg:         oklch(18% 0.018 250);
+  --fg-secondary: oklch(44% 0.014 250);
+  --fg-muted:   oklch(65% 0.012 245);
+  --fg-inverse: oklch(100% 0 0);
+
+  /* 边框 */
+  --border:     oklch(89% 0.006 240);
+  --border-light: oklch(93% 0.004 235);
+
+  /* 强调色 — 蓝绿系（医疗信任感） */
+  --accent:           oklch(54% 0.13 180);
+  --accent-light:     oklch(88% 0.04 180);
+  --accent-bg:        oklch(96% 0.015 180);
+  --accent-hover:     oklch(48% 0.14 185);
+
+  /* 语义色彩 */
+  --success:    oklch(58% 0.14 150);
+  --success-bg: oklch(94% 0.04 150);
+  --warning:    oklch(68% 0.15 75);
+  --warning-bg: oklch(95% 0.05 80);
+  --danger:     oklch(52% 0.19 18);
+  --danger-bg:  oklch(95% 0.03 15);
+  --info:       oklch(55% 0.13 240);
+  --info-bg:    oklch(93% 0.03 245);
+
+  /* 品牌暖调补充 */
+  --coral:      oklch(62% 0.12 35);
+  --coral-bg:   oklch(94% 0.03 35);
+
+  /* 字体栈 */
+  --font-display: 'Söhne', 'Avenir Next', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', ui-monospace, monospace;
+
+  /* 字号阶梯 */
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.8125rem; /* 13px */
+  --text-base: 0.875rem;  /* 14px */
+  --text-md:   1rem;      /* 16px */
+  --text-lg:   1.25rem;   /* 20px */
+  --text-xl:   1.5rem;    /* 24px */
+  --text-2xl:  2rem;      /* 32px */
+  --text-3xl:  2.5rem;    /* 40px */
+
+  /* 间距 */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.04);
+  --shadow-sm: 0 1px 4px oklch(0% 0 0 / 0.06);
+  --shadow-md: 0 4px 16px oklch(0% 0 0 / 0.08);
+  --shadow-lg: 0 8px 32px oklch(0% 0 0 / 0.10);
+
+  /* 过渡 */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+}
+
+/* ============================================================
+   全局重置 & 基础排版
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--fg);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ============================================================
+   导航 · 顶部固定
+   ============================================================ */
+.topnav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: oklch(100% 0 0 / 0.82);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+  padding: 0 var(--space-8);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topnav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-weight: 680;
+  font-size: var(--text-md);
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.topnav-brand .logo-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--fg-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.topnav-links {
+  display: flex;
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.topnav-links a {
+  text-decoration: none;
+  color: var(--fg-secondary);
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+  font-weight: 500;
+}
+
+.topnav-links a:hover,
+.topnav-links a.active {
+  color: var(--fg);
+  background: var(--surface-alt);
+}
+
+/* ============================================================
+   页面骨架
+   ============================================================ */
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-8) var(--space-12);
+}
+
+.section {
+  margin-bottom: var(--space-12);
+}
+
+.section-header {
+  margin-bottom: var(--space-8);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-2);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  line-height: 1.15;
+}
+
+.section-desc {
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+  margin-top: var(--space-2);
+  max-width: 640px;
+}
+
+/* ============================================================
+   令牌展示 · 色板
+   ============================================================ */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-4);
+}
+
+.swatch-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.swatch-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.swatch-preview {
+  height: 80px;
+  position: relative;
+}
+
+.swatch-info {
+  padding: var(--space-3) var(--space-4);
+}
+
+.swatch-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--fg);
+}
+
+.swatch-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   排版展示
+   ============================================================ */
+.type-sample {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+}
+
+.type-col h3 {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-6);
+}
+
+.type-item {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.type-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.type-preview {
+  margin-bottom: var(--space-1);
+}
+
+.type-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  display: flex;
+  gap: var(--space-4);
+}
+
+.display-2xl { font-family: var(--font-display); font-size: 3rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
+.display-xl  { font-family: var(--font-display); font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.display-lg  { font-family: var(--font-display); font-size: 2rem; font-weight: 680; letter-spacing: -0.015em; line-height: 1.2; }
+.heading-md  { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+.heading-sm  { font-family: var(--font-body); font-size: 1.125rem; font-weight: 600; line-height: 1.35; }
+.body-lg     { font-size: 1rem; line-height: 1.6; }
+.body-base   { font-size: 0.875rem; line-height: 1.6; }
+.body-sm     { font-size: 0.8125rem; line-height: 1.55; }
+.caption     { font-size: 0.75rem; line-height: 1.5; color: var(--fg-muted); }
+.mono-label  { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ============================================================
+   组件展示卡片
+   ============================================================ */
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--space-6);
+}
+
+.component-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.component-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.component-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-4);
+}
+
+/* KPI 卡片 */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-label {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+  line-height: 1.2;
+}
+
+.kpi-delta {
+  font-size: var(--text-xs);
+  margin-top: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.kpi-delta.up   { color: var(--success); }
+.kpi-delta.down { color: var(--danger); }
+.kpi-delta.neutral { color: var(--fg-muted); }
+
+/* 状态标签 */
+.status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.pill-done      { background: var(--success-bg); color: var(--success); }
+.pill-progress  { background: var(--info-bg);    color: var(--info); }
+.pill-blocked   { background: var(--danger-bg);  color: var(--danger); }
+.pill-review    { background: var(--warning-bg); color: var(--warning); }
+.pill-todo      { background: var(--surface-alt); color: var(--fg-muted); }
+
+/* 数据表（Notion 风格） */
+.db-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.db-table thead th {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  font-weight: 500;
+  text-align: left;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.db-table tbody td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+  color: var(--fg);
+  vertical-align: middle;
+}
+
+.db-table tbody tr:hover {
+  background: var(--surface-alt);
+}
+
+.db-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 操作按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--duration-fast) var(--ease-out);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--fg-inverse);
+  border-color: var(--accent);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--fg-secondary);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--surface-alt);
+  color: var(--fg);
+}
+
+.btn-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+}
+
+/* ============================================================
+   标签页切换
+   ============================================================ */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-8);
+}
+
+.tab-btn {
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--fg-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: var(--fg-secondary);
+}
+
+.tab-btn.active {
+  color: var(--fg);
+  border-bottom-color: var(--accent);
+}
+
+/* ============================================================
+   仪表盘 · 惠福星盘
+   ============================================================ */
+.dashboard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.dash-topbar {
+  padding: var(--space-4) var(--space-8);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.dash-breadcrumb {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dash-breadcrumb span {
+  color: var(--fg-secondary);
+}
+
+.dash-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--success);
+  padding: var(--space-1) var(--space-4);
+  background: var(--success-bg);
+  border-radius: 100px;
+}
+
+.dash-live-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.dash-body {
+  padding: var(--space-8);
+}
+
+.dash-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.dash-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dash-title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  line-height: 1.15;
+}
+
+.dash-meta {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  margin-top: var(--space-1);
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.dash-callout {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+  margin-bottom: var(--space-8);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dash-callout .callout-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.dash-section-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-4);
+}
+
+/* 两列布局 */
+.dash-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+/* 趋势图卡片 */
+.sparkline-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.sparkline-title {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--fg);
+  margin-bottom: var(--space-4);
+}
+
+.sparkline-svg {
+  width: 100%;
+  height: 120px;
+}
+
+/* 活动流 */
+.activity-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.activity-title {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--fg);
+  margin-bottom: var(--space-4);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.activity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--text-sm);
+}
+
+.activity-row:last-child {
+  border-bottom: none;
+}
+
+.activity-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.activity-time {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .page { padding: var(--space-6) var(--space-4); }
+  .type-sample { grid-template-columns: 1fr; }
+  .dash-two-col { grid-template-columns: 1fr; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .component-grid { grid-template-columns: 1fr; }
+  .dash-body { padding: var(--space-4); }
+  .topnav { padding: 0 var(--space-4); }
+  .dash-topbar { padding: var(--space-3) var(--space-4); }
+}
+
+@media (max-width: 480px) {
+  .kpi-row { grid-template-columns: 1fr; }
+  .topnav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     顶部导航
+     ============================================================ -->
+<nav class="topnav">
+  <div class="topnav-brand">
+    <div class="logo-icon">⭐</div>
+    <span>惠福星链 · 设计系统</span>
+  </div>
+  <ul class="topnav-links">
+    <li><a href="#tokens" class="active">令牌</a></li>
+    <li><a href="#typography">排版</a></li>
+    <li><a href="#components">组件</a></li>
+    <li><a href="#dashboard">惠福星盘</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+<!-- ============================================================
+     1. 设计令牌 · 色板
+     ============================================================ -->
+<section class="section" id="tokens">
+  <div class="section-header">
+    <div class="section-label">01 · Design Tokens</div>
+    <h1 class="section-title">色彩系统</h1>
+    <p class="section-desc">基于 oklch 色彩空间的医疗健康调色板。蓝绿主色传递专业信任，暖珊瑚色点缀人文关怀。</p>
+  </div>
+
+  <div class="swatch-grid">
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--bg);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--bg · 页面背景</div>
+        <div class="swatch-value">oklch(98.5% 0.003 220)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--surface); border-bottom: 1px solid var(--border);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--surface · 卡片背景</div>
+        <div class="swatch-value">oklch(100% 0 0)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--surface-alt);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--surface-alt · 次级背景</div>
+        <div class="swatch-value">oklch(96% 0.004 215)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--fg);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--fg · 主文字</div>
+        <div class="swatch-value">oklch(18% 0.018 250)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--fg-secondary);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--fg-secondary · 次文字</div>
+        <div class="swatch-value">oklch(44% 0.014 250)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--fg-muted);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--fg-muted · 弱化文字</div>
+        <div class="swatch-value">oklch(65% 0.012 245)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--border);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--border · 边框</div>
+        <div class="swatch-value">oklch(89% 0.006 240)</div>
+      </div>
+    </div>
+    <div class="swatch-card" style="box-shadow: 0 0 0 2px var(--accent);">
+      <div class="swatch-preview" style="background: var(--accent);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--accent · 主强调色 ★</div>
+        <div class="swatch-value">oklch(54% 0.13 180)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--success);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--success · 成功</div>
+        <div class="swatch-value">oklch(58% 0.14 150)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--warning);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--warning · 警告</div>
+        <div class="swatch-value">oklch(68% 0.15 75)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--danger);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--danger · 危险</div>
+        <div class="swatch-value">oklch(52% 0.19 18)</div>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-preview" style="background: var(--coral);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">--coral · 品牌暖调</div>
+        <div class="swatch-value">oklch(62% 0.12 35)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     2. 排版系统
+     ============================================================ -->
+<section class="section" id="typography">
+  <div class="section-header">
+    <div class="section-label">02 · Typography</div>
+    <h1 class="section-title">排版系统</h1>
+    <p class="section-desc">显示字体 Söhne / Avenir Next，正文系统字体栈（SF Pro Text + PingFang + 微软雅黑），等宽数字 JetBrains Mono。</p>
+  </div>
+
+  <div class="type-sample">
+    <div class="type-col">
+      <h3>显示字体 · Display</h3>
+      <div class="type-item">
+        <div class="type-preview display-2xl">惠福星链</div>
+        <div class="type-meta"><span>display-2xl</span><span>48px / 700</span><span>-0.025em</span></div>
+      </div>
+      <div class="type-item">
+        <div class="type-preview display-xl">全病程健康协同</div>
+        <div class="type-meta"><span>display-xl</span><span>40px / 700</span><span>-0.02em</span></div>
+      </div>
+      <div class="type-item">
+        <div class="type-preview display-lg">惠福星盘 · 运营驾驶舱</div>
+        <div class="type-meta"><span>display-lg</span><span>32px / 680</span><span>-0.015em</span></div>
+      </div>
+      <div class="type-item">
+        <div class="type-preview heading-md">会员看板总览</div>
+        <div class="type-meta"><span>heading-md</span><span>24px / 600</span><span>-0.01em</span></div>
+      </div>
+    </div>
+    <div class="type-col">
+      <h3>正文 & 辅助 · Body & Utility</h3>
+      <div class="type-item">
+        <div class="type-preview body-lg">惠福星链以"家庭ID"为核心，打通院内HIS/LIS/PACS/EMR及五健数据。</div>
+        <div class="type-meta"><span>body-lg</span><span>16px</span><span>line-height 1.6</span></div>
+      </div>
+      <div class="type-item">
+        <div class="type-preview body-base">深度嵌入公立医院就诊流程的全生命周期健康管理 SaaS 平台。</div>
+        <div class="type-meta"><span>body-base</span><span>14px</span><span>line-height 1.6</span></div>
+      </div>
+      <div class="type-item">
+        <div class="type-preview body-sm">覆盖备孕→孕期→分娩→产后→育儿→五健管理的完整时间轴。</div>
+        <div class="type-meta"><span>body-sm</span><span>13px</span><span>line-height 1.55</span></div>
+      </div>
+      <div class="type-item">
+        <div class="type-preview mono-label">系统标签 · MONOSPACE UPPERCASE</div>
+        <div class="type-meta"><span>mono-label</span><span>12px</span><span>JetBrains Mono</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     3. 组件库
+     ============================================================ -->
+<section class="section" id="components">
+  <div class="section-header">
+    <div class="section-label">03 · Components</div>
+    <h1 class="section-title">组件库</h1>
+    <p class="section-desc">核心 UI 组件：KPI 卡片、数据表、状态标签、操作按钮。所有组件遵循 8px 网格、6–14px 圆角系统。</p>
+  </div>
+
+  <div class="component-grid">
+    <!-- KPI 卡片 -->
+    <div class="component-card">
+      <div class="component-label">KPI Card</div>
+      <div class="kpi-row" style="grid-template-columns: 1fr 1fr;">
+        <div class="kpi-card">
+          <div class="kpi-label">活跃会员</div>
+          <div class="kpi-value">2,847</div>
+          <div class="kpi-delta up">↑ 12% vs 上月</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">随访完成率</div>
+          <div class="kpi-value">94.3%</div>
+          <div class="kpi-delta up">↑ 2.1% vs 上月</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 状态标签 -->
+    <div class="component-card">
+      <div class="component-label">Status Pills</div>
+      <div class="status-pills">
+        <span class="pill pill-done">已完成</span>
+        <span class="pill pill-progress">进行中</span>
+        <span class="pill pill-blocked">已阻塞</span>
+        <span class="pill pill-review">审核中</span>
+        <span class="pill pill-todo">待开始</span>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="component-card">
+      <div class="component-label">Buttons</div>
+      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-primary">主要操作</button>
+        <button class="btn btn-ghost">次要操作</button>
+        <button class="btn btn-primary btn-sm">小按钮</button>
+        <button class="btn btn-ghost btn-sm">刷新</button>
+      </div>
+    </div>
+
+    <!-- 数据表（精简） -->
+    <div class="component-card" style="grid-column: 1 / -1;">
+      <div class="component-label">Database Table（Notion 风格）</div>
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th>服务包名称</th>
+            <th>价格</th>
+            <th>销量</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">VIP 孕产全程护航</td>
+            <td style="font-family:var(--font-mono);">¥12,800</td>
+            <td style="font-family:var(--font-mono);">186</td>
+            <td><span class="pill pill-progress">热销中</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">VVIP 家庭健康管家</td>
+            <td style="font-family:var(--font-mono);">¥22,800</td>
+            <td style="font-family:var(--font-mono);">94</td>
+            <td><span class="pill pill-progress">热销中</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">产后康复套餐</td>
+            <td style="font-family:var(--font-mono);">¥6,800</td>
+            <td style="font-family:var(--font-mono);">273</td>
+            <td><span class="pill pill-done">稳定</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     4. 惠福星盘 · 运营驾驶舱
+     ============================================================ -->
+<section class="section" id="dashboard">
+  <div class="section-header">
+    <div class="section-label">04 · Applied Example</div>
+    <h1 class="section-title">惠福星盘 · 运营驾驶舱</h1>
+    <p class="section-desc">基于设计令牌和组件库搭建的运营数据看板。展示会员 KPI、服务包销售排行、随访完成率、转化漏斗及最近动态。</p>
+  </div>
+
+  <div class="dashboard">
+    <!-- 顶部 bar -->
+    <div class="dash-topbar">
+      <div class="dash-breadcrumb">
+        惠福星链 <span style="color:var(--fg-muted);">/</span> <span>惠福星盘</span> <span style="color:var(--fg-muted);">/</span> 运营驾驶舱
+      </div>
+      <div class="dash-live-pill">
+        <span class="dot"></span> 实时 · 已同步
+      </div>
+    </div>
+
+    <div class="dash-body">
+      <!-- 页面头部 -->
+      <div class="dash-header">
+        <div class="dash-emoji">📊</div>
+        <div>
+          <h1 class="dash-title">惠福星盘 · 运营驾驶舱</h1>
+          <div class="dash-meta">
+            <span>最后编辑：张运营</span>
+            <span>数据刷新：刚刚</span>
+            <span><button class="btn btn-ghost btn-sm" onclick="refreshDashboard()" style="margin-left:var(--space-2);">🔄 刷新数据</button></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 说明条 -->
+      <div class="dash-callout">
+        <span class="callout-icon">🔗</span>
+        <span>数据来源：医院 HIS/LIS/PACS/五健系统（前置机 · 只读接口 · 实时同步），更新时间戳 2026-01-21T10:32:00+08:00</span>
+      </div>
+
+      <!-- KPI 卡片行 -->
+      <div class="dash-section-label">核心指标</div>
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">活跃会员</div>
+          <div class="kpi-value" id="kpi-members">2,847</div>
+          <div class="kpi-delta up">↑ 12% vs 上月</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">本月服务包营收</div>
+          <div class="kpi-value" id="kpi-revenue">¥486,200</div>
+          <div class="kpi-delta up">↑ 8.5% vs 上月</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">随访完成率</div>
+          <div class="kpi-value" id="kpi-followup">94.3%</div>
+          <div class="kpi-delta up">↑ 2.1% vs 上月</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">满意度评分</div>
+          <div class="kpi-value" id="kpi-satisfaction">4.82</div>
+          <div class="kpi-delta up">↑ 0.15 vs 上月</div>
+        </div>
+      </div>
+
+      <!-- 两列布局 -->
+      <div class="dash-two-col">
+        <!-- 左侧：服务包销售排行 -->
+        <div class="sparkline-card">
+          <div class="sparkline-title">📦 服务包销售排行</div>
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>服务包</th>
+                <th style="text-align:right;">单价</th>
+                <th style="text-align:right;">销量</th>
+                <th style="text-align:right;">营收</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">产后康复套餐</td>
+                <td style="text-align:right;font-family:var(--font-mono);">¥6,800</td>
+                <td style="text-align:right;font-family:var(--font-mono);">273</td>
+                <td style="text-align:right;font-family:var(--font-mono);color:var(--fg);">¥1,856,400</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">儿保成长套餐</td>
+                <td style="text-align:right;font-family:var(--font-mono);">¥3,800</td>
+                <td style="text-align:right;font-family:var(--font-mono);">412</td>
+                <td style="text-align:right;font-family:var(--font-mono);color:var(--fg);">¥1,565,600</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">VIP 孕产全程护航</td>
+                <td style="text-align:right;font-family:var(--font-mono);">¥12,800</td>
+                <td style="text-align:right;font-family:var(--font-mono);">186</td>
+                <td style="text-align:right;font-family:var(--font-mono);color:var(--fg);">¥2,380,800</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">VVIP 家庭健康管家</td>
+                <td style="text-align:right;font-family:var(--font-mono);">¥22,800</td>
+                <td style="text-align:right;font-family:var(--font-mono);">94</td>
+                <td style="text-align:right;font-family:var(--font-mono);color:var(--accent);font-weight:600;">¥2,143,200</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">五健筛查套餐</td>
+                <td style="text-align:right;font-family:var(--font-mono);">¥1,800</td>
+                <td style="text-align:right;font-family:var(--font-mono);">631</td>
+                <td style="text-align:right;font-family:var(--font-mono);color:var(--fg);">¥1,135,800</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 右侧：随访完成 + 活动流 -->
+        <div style="display:flex;flex-direction:column;gap:var(--space-6);">
+          <!-- 随访完成率 -->
+          <div class="sparkline-card">
+            <div class="sparkline-title">📈 随访完成率趋势（近 7 天）</div>
+            <svg class="sparkline-svg" viewBox="0 0 400 120">
+              <defs>
+                <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="oklch(54% 0.13 180)" stop-opacity="0.18" />
+                  <stop offset="100%" stop-color="oklch(54% 0.13 180)" stop-opacity="0.02" />
+                </linearGradient>
+              </defs>
+              <!-- 网格线 -->
+              <line x1="0" y1="90" x2="400" y2="90" stroke="oklch(89% 0.006 240)" stroke-width="0.5" />
+              <line x1="0" y1="60" x2="400" y2="60" stroke="oklch(89% 0.006 240)" stroke-width="0.5" />
+              <line x1="0" y1="30" x2="400" y2="30" stroke="oklch(89% 0.006 240)" stroke-width="0.5" />
+              <!-- 面积填充 -->
+              <path d="M0,95 L57,82 L114,75 L171,68 L229,60 L286,52 L343,45 L400,38 L400,120 L0,120 Z" fill="url(#sparkFill)" />
+              <!-- 折线 -->
+              <polyline points="0,95 57,82 114,75 171,68 229,60 286,52 343,45 400,38"
+                fill="none" stroke="oklch(54% 0.13 180)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- 数据点 -->
+              <circle cx="57" cy="82" r="3.5" fill="white" stroke="oklch(54% 0.13 180)" stroke-width="2" />
+              <circle cx="114" cy="75" r="3.5" fill="white" stroke="oklch(54% 0.13 180)" stroke-width="2" />
+              <circle cx="171" cy="68" r="3.5" fill="white" stroke="oklch(54% 0.13 180)" stroke-width="2" />
+              <circle cx="229" cy="60" r="3.5" fill="white" stroke="oklch(54% 0.13 180)" stroke-width="2" />
+              <circle cx="286" cy="52" r="3.5" fill="white" stroke="oklch(54% 0.13 180)" stroke-width="2" />
+              <circle cx="343" cy="45" r="3.5" fill="white" stroke="oklch(54% 0.13 180)" stroke-width="2" />
+              <circle cx="400" cy="38" r="5" fill="oklch(54% 0.13 180)" stroke="white" stroke-width="2" />
+              <!-- 标签 -->
+              <text x="400" y="28" text-anchor="end" font-family="system-ui" font-size="11" fill="oklch(54% 0.13 180)" font-weight="600">97.2%</text>
+            </svg>
+            <div style="display:flex;justify-content:space-between;margin-top:var(--space-2);font-size:var(--text-xs);color:var(--fg-muted);">
+              <span>1/15</span><span>1/16</span><span>1/17</span><span>1/18</span><span>1/19</span><span>1/20</span><span>1/21</span>
+            </div>
+          </div>
+
+          <!-- 最近动态 -->
+          <div class="activity-card" style="flex:1;">
+            <div class="activity-title">🕐 最近动态</div>
+            <div class="activity-list">
+              <div class="activity-row">
+                <div class="activity-avatar" style="background:var(--accent);">李</div>
+                <div style="flex:1;">医疗管家 <strong>李医生</strong> 完成产后42天随访 — 会员 张*芳</div>
+                <div class="activity-time">2 分钟前</div>
+              </div>
+              <div class="activity-row">
+                <div class="activity-avatar" style="background:var(--coral);">王</div>
+                <div style="flex:1;">服务管家 <strong>王莉</strong> 核销 VIP 陪诊服务 — 会员 陈*婷</div>
+                <div class="activity-time">8 分钟前</div>
+              </div>
+              <div class="activity-row">
+                <div class="activity-avatar" style="background:var(--success);">系</div>
+                <div style="flex:1;"><strong>系统</strong> 自动同步 14 份检验报告至惠福时光轴</div>
+                <div class="activity-time">15 分钟前</div>
+              </div>
+              <div class="activity-row">
+                <div class="activity-avatar" style="background:var(--info);">刘</div>
+                <div style="flex:1;">医疗管家 <strong>刘护士</strong> 创建疫苗提醒任务 — 会员 王*娟</div>
+                <div class="activity-time">32 分钟前</div>
+              </div>
+              <div class="activity-row">
+                <div class="activity-avatar" style="background:var(--danger);">警</div>
+                <div style="flex:1;"><strong>惠福灵犀</strong> 触发紧急预警 — 关键词"出血"，已转接人工</div>
+                <div class="activity-time">48 分钟前</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部来源 -->
+      <div style="margin-top:var(--space-8);padding-top:var(--space-4);border-top:1px solid var(--border-light);font-size:var(--text-xs);color:var(--fg-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);">
+        <span>数据源：Notion API · 工作区 惠福星链_Production</span>
+        <span>连接器：notion-huifu-starchain-prod</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 子模块快捷入口卡片 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4);margin-top:var(--space-6);">
+    <a href="#" style="text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-6);transition:all var(--duration-fast) var(--ease-out);" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
+      <div style="font-size:1.5rem;margin-bottom:var(--space-2);">⏳</div>
+      <div style="font-weight:600;font-size:var(--text-sm);">惠福时光轴</div>
+      <div style="font-size:var(--text-xs);color:var(--fg-muted);margin-top:var(--space-1);">全流程管理 · 健康档案 · 随访管理</div>
+    </a>
+    <a href="#" style="text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-6);transition:all var(--duration-fast) var(--ease-out);" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
+      <div style="font-size:1.5rem;margin-bottom:var(--space-2);">🤖</div>
+      <div style="font-weight:600;font-size:var(--text-sm);">惠福灵犀</div>
+      <div style="font-size:var(--text-xs);color:var(--fg-muted);margin-top:var(--space-1);">AI+HCRM · 智能问答 · 随访自动化</div>
+    </a>
+    <a href="#" style="text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-6);transition:all var(--duration-fast) var(--ease-out);" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
+      <div style="font-size:1.5rem;margin-bottom:var(--space-2);">👨‍👩‍👧</div>
+      <div style="font-weight:600;font-size:var(--text-sm);">惠福同心圆</div>
+      <div style="font-size:var(--text-xs);color:var(--fg-muted);margin-top:var(--space-1);">家庭ID · 成员档案 · 共享权益</div>
+    </a>
+  </div>
+</section>
+
+</div><!-- /page -->
+
+<!-- ============================================================
+     交互脚本
+     ============================================================ -->
+<script>
+function refreshDashboard() {
+  const kpis = [
+    { id: 'kpi-members', vals: ['2,847', '2,861', '2,874', '2,892', '2,910'] },
+    { id: 'kpi-revenue', vals: ['¥486,200', '¥489,500', '¥492,800', '¥496,100', '¥499,400'] },
+    { id: 'kpi-followup', vals: ['94.3%', '94.5%', '94.7%', '94.8%', '95.0%'] },
+    { id: 'kpi-satisfaction', vals: ['4.82', '4.83', '4.84', '4.84', '4.85'] }
+  ];
+  kpis.forEach(kpi => {
+    const el = document.getElementById(kpi.id);
+    const current = kpi.vals[Math.floor(Math.random() * kpi.vals.length)];
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 120ms ease-out';
+    setTimeout(() => {
+      el.textContent = current;
+      el.style.opacity = '1';
+    }, 120);
+  });
+}
+
+// 平滑滚动导航高亮
+document.querySelectorAll('.topnav-links a').forEach(link => {
+  link.addEventListener('click', function(e) {
+    document.querySelectorAll('.topnav-links a').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

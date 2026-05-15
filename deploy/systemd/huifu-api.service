@@ -1,0 +1,50 @@
+# ============================================================
+# 惠福星链 · API 服务 systemd unit
+# 安装: sudo cp huifu-api.service /etc/systemd/system/
+#       sudo systemctl daemon-reload
+#       sudo systemctl enable --now huifu-api
+# ============================================================
+[Unit]
+Description=Huifu StarChain API Service
+Documentation=https://wiki.huifu-starchain.local
+After=network.target mysql.service redis.service
+Wants=mysql.service redis.service
+
+[Service]
+Type=simple
+User=huifu
+Group=huifu
+WorkingDirectory=/opt/huifu-starchain/backend
+ExecStart=/usr/bin/java \
+    -Xms512m -Xmx2g \
+    -XX:+UseZGC \
+    -XX:ZCollectionInterval=120 \
+    -Djava.security.egd=file:/dev/./urandom \
+    -Dspring.profiles.active=prod \
+    -jar /opt/huifu-starchain/backend/starchain-1.0.0.jar
+ExecStop=/bin/kill -15 $MAINPID
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+
+# 日志
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=huifu-api
+
+# 安全加固
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/log/huifu-starchain
+ReadOnlyPaths=/opt/huifu-starchain
+
+# 资源限制
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryMax=3G
+CPUQuota=200%
+
+[Install]
+WantedBy=multi-user.target
