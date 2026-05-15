@@ -72,6 +72,16 @@ import java.math.BigDecimal;
     public void setTermsText(String termsText) { this.termsText = termsText; }
     public Long getCreatedBy() { return createdBy; }
     public void setCreatedBy(Long createdBy) { this.createdBy = createdBy; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public Integer getDurationDays() { return durationDays; }
+    public void setDurationDays(Integer durationDays) { this.durationDays = durationDays; }
+    public Integer getMaxBeneficiaries() { return maxBeneficiaries; }
+    public void setMaxBeneficiaries(Integer maxBeneficiaries) { this.maxBeneficiaries = maxBeneficiaries; }
+    public PkgStatus getStatus() { return status; }
+    public void setStatus(PkgStatus status) { this.status = status; }
+    public Integer getSortOrder() { return sortOrder; }
+    public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
 
     public enum PkgStatus { DRAFT, ON_SHELF, OFF_SHELF }
 }

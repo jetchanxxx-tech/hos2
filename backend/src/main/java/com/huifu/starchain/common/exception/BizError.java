@@ -11,11 +11,6 @@ public class BizError {
     public int getCode() { return code; }
     public String getMessage() { return message; }
 
-    private BizError(int code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-
     // ---- Common ----
     public static final BizError BAD_REQUEST          = new BizError(40000, "请求参数有误");
     public static final BizError UNAUTHORIZED         = new BizError(40100, "未登录或令牌已过期");

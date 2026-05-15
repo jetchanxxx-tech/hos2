@@ -1,5 +1,5 @@
 # ============================================================
-# 惠福星链 · API 服务 systemd unit
+# 惠福星链 · API 服务 systemd unit（原生部署版）
 # 安装: sudo cp huifu-api.service /etc/systemd/system/
 #       sudo systemctl daemon-reload
 #       sudo systemctl enable --now huifu-api
@@ -7,20 +7,21 @@
 [Unit]
 Description=Huifu StarChain API Service
 Documentation=https://wiki.huifu-starchain.local
-After=network.target mysql.service redis.service
-Wants=mysql.service redis.service
+After=network.target nginx.service mysql.service redis.service minio.service
+Wants=mysql.service redis.service minio.service
 
 [Service]
 Type=simple
 User=huifu
 Group=huifu
 WorkingDirectory=/opt/huifu-starchain/backend
+EnvironmentFile=/opt/huifu-starchain/deploy/.env
+ExecStartPre=/bin/sh -c 'test -f /opt/huifu-starchain/backend/starchain-1.0.0.jar || { echo "JAR not found"; exit 1; }'
 ExecStart=/usr/bin/java \
     -Xms512m -Xmx2g \
     -XX:+UseZGC \
     -XX:ZCollectionInterval=120 \
     -Djava.security.egd=file:/dev/./urandom \
-    -Dspring.profiles.active=prod \
     -jar /opt/huifu-starchain/backend/starchain-1.0.0.jar
 ExecStop=/bin/kill -15 $MAINPID
 Restart=on-failure
@@ -35,10 +36,9 @@ SyslogIdentifier=huifu-api
 # 安全加固
 NoNewPrivileges=yes
 PrivateTmp=yes
-ProtectSystem=strict
+ProtectSystem=full
 ProtectHome=yes
-ReadWritePaths=/var/log/huifu-starchain
-ReadOnlyPaths=/opt/huifu-starchain
+ReadWritePaths=/var/log/huifu-starchain /opt/huifu-starchain
 
 # 资源限制
 LimitNOFILE=65536

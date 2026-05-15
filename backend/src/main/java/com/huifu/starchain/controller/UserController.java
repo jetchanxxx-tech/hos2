@@ -17,7 +17,7 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService, UserService userService) { this.userService = userService; this.userService = userService; }
+    public UserController(UserService userService) { this.userService = userService; }
 
     @GetMapping("/me")
     public ApiResponse<User> me(@AuthenticationPrincipal Long userId) {
@@ -50,6 +50,8 @@ public class UserController {
 class FamilyController {
 
     private final UserService userService;
+
+    FamilyController(UserService userService) { this.userService = userService; }
 
     @GetMapping("/me")
     public ApiResponse<Family> myFamily(@AuthenticationPrincipal Long userId) {

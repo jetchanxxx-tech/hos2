@@ -14,6 +14,8 @@ public class AuthController {
 
     private final AuthService authService;
 
+    public AuthController(AuthService authService) { this.authService = authService; }
+
     @PostMapping("/register")
     public ApiResponse<LoginResponse> register(@Valid @RequestBody RegisterRequest req) {
         return ApiResponse.ok(authService.register(req));

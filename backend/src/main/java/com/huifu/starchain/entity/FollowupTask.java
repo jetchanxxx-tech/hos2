@@ -100,4 +100,12 @@ import java.time.LocalDateTime;
     public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
     public Long getCompletedBy() { return completedBy; }
     public void setCompletedBy(Long completedBy) { this.completedBy = completedBy; }
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getFollowupMethod() { return followupMethod; }
+    public void setFollowupMethod(String followupMethod) { this.followupMethod = followupMethod; }
+    public Boolean getAiGenerated() { return aiGenerated; }
+    public void setAiGenerated(Boolean aiGenerated) { this.aiGenerated = aiGenerated; }
 }

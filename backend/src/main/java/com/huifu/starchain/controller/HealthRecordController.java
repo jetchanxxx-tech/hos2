@@ -19,6 +19,8 @@ public class HealthRecordController {
 
     private final HealthRecordService recordService;
 
+    public HealthRecordController(HealthRecordService recordService) { this.recordService = recordService; }
+
     @GetMapping
     public ApiResponse<PageResult<HealthRecord>> getTimeline(
             @RequestParam Long userId,

@@ -17,6 +17,8 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
+    public DashboardController(DashboardService dashboardService) { this.dashboardService = dashboardService; }
+
     @GetMapping("/kpi-summary")
     public ApiResponse<Map<String, Object>> kpiSummary() {
         return ApiResponse.ok(dashboardService.getKpiSummary());

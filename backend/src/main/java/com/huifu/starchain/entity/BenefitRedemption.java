@@ -70,4 +70,10 @@ import java.time.LocalDateTime;
     public void setRedeemLocation(String redeemLocation) { this.redeemLocation = redeemLocation; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+    public Integer getTotalCount() { return totalCount; }
+    public void setTotalCount(Integer totalCount) { this.totalCount = totalCount; }
+    public Integer getUsedCount() { return usedCount; }
+    public void setUsedCount(Integer usedCount) { this.usedCount = usedCount; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

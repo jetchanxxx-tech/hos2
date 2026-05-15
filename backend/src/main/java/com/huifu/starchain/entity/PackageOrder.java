@@ -91,4 +91,6 @@ import java.time.LocalDateTime;
     public void setRefundAt(LocalDateTime refundAt) { this.refundAt = refundAt; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

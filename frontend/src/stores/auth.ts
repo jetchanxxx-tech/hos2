@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { authApi } from '@/api'
+import { authApi, userApi } from '@/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<any>(null)
@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchMe() {
     try {
-      const res: any = await authApi.me ? undefined : undefined
+      const res: any = await userApi.me()
     } catch { /* ignore */ }
   }
 

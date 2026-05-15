@@ -27,6 +27,12 @@ import jakarta.persistence.*;
     public void setPrimaryUserId(Long primaryUserId) { this.primaryUserId = primaryUserId; }
     public String getInviteCode() { return inviteCode; }
     public void setInviteCode(String inviteCode) { this.inviteCode = inviteCode; }
+    public Integer getMemberCount() { return memberCount; }
+    public void setMemberCount(Integer memberCount) { this.memberCount = memberCount; }
+    public SharePolicy getSharePolicy() { return sharePolicy; }
+    public void setSharePolicy(SharePolicy sharePolicy) { this.sharePolicy = sharePolicy; }
+    public FamilyStatus getStatus() { return status; }
+    public void setStatus(FamilyStatus status) { this.status = status; }
 
     @Column(name = "share_policy", nullable = false, length = 16)
     @Enumerated(EnumType.STRING)

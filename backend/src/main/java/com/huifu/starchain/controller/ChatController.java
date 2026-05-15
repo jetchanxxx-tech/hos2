@@ -18,6 +18,8 @@ public class ChatController {
 
     private final ChatService chatService;
 
+    public ChatController(ChatService chatService) { this.chatService = chatService; }
+
     @PostMapping("/sessions")
     public ApiResponse<ChatSession> startSession(@AuthenticationPrincipal Long userId,
                                                   @RequestParam(defaultValue = "MINIPROGRAM") String channel) {

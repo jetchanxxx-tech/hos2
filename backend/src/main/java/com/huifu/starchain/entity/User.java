@@ -101,6 +101,14 @@ import java.time.LocalDateTime;
     public void setLastLoginAt(LocalDateTime lastLoginAt) { this.lastLoginAt = lastLoginAt; }
     public String getLastLoginIp() { return lastLoginIp; }
     public void setLastLoginIp(String lastLoginIp) { this.lastLoginIp = lastLoginIp; }
+    public Integer getGender() { return gender; }
+    public void setGender(Integer gender) { this.gender = gender; }
+    public UserRole getRole() { return role; }
+    public void setRole(UserRole role) { this.role = role; }
+    public UserStatus getStatus() { return status; }
+    public void setStatus(UserStatus status) { this.status = status; }
+    public Integer getDataAuthConsent() { return dataAuthConsent; }
+    public void setDataAuthConsent(Integer dataAuthConsent) { this.dataAuthConsent = dataAuthConsent; }
 
     public enum UserRole {
         RESIDENT, BUTLER_MEDICAL, BUTLER_SERVICE, HOSPITAL_ADMIN, OPS_ADMIN, SUPER_ADMIN

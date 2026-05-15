@@ -16,6 +16,8 @@ public class ServicePackageController {
 
     private final ServicePackageService pkgService;
 
+    public ServicePackageController(ServicePackageService pkgService) { this.pkgService = pkgService; }
+
     @GetMapping
     public ApiResponse<PageResult<ServicePackage>> list(
             @RequestParam(defaultValue = "1") int page,

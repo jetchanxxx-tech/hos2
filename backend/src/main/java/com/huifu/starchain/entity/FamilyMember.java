@@ -21,6 +21,14 @@ import java.time.LocalDateTime;
     public void setFamilyId(Long familyId) { this.familyId = familyId; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
+    public Relationship getRelationship() { return relationship; }
+    public void setRelationship(Relationship relationship) { this.relationship = relationship; }
+    public String getShareScope() { return shareScope; }
+    public void setShareScope(String shareScope) { this.shareScope = shareScope; }
+    public Boolean getIsEmergencyContact() { return isEmergencyContact; }
+    public void setIsEmergencyContact(Boolean isEmergencyContact) { this.isEmergencyContact = isEmergencyContact; }
+    public LocalDateTime getJoinedAt() { return joinedAt; }
+    public void setJoinedAt(LocalDateTime joinedAt) { this.joinedAt = joinedAt; }
 
     @Column(name = "relationship", nullable = false, length = 16)
     @Enumerated(EnumType.STRING)

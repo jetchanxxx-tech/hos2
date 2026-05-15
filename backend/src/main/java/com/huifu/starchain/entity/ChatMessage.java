@@ -78,4 +78,12 @@ import java.time.LocalDateTime;
     public void setAiAnswerSource(String aiAnswerSource) { this.aiAnswerSource = aiAnswerSource; }
     public LocalDateTime getReadAt() { return readAt; }
     public void setReadAt(LocalDateTime readAt) { this.readAt = readAt; }
+    public Integer getSeqNo() { return seqNo; }
+    public void setSeqNo(Integer seqNo) { this.seqNo = seqNo; }
+    public String getMsgType() { return msgType; }
+    public void setMsgType(String msgType) { this.msgType = msgType; }
+    public Boolean getTriggerAlert() { return triggerAlert; }
+    public void setTriggerAlert(Boolean triggerAlert) { this.triggerAlert = triggerAlert; }
+    public Boolean getIsRead() { return isRead; }
+    public void setIsRead(Boolean isRead) { this.isRead = isRead; }
 }

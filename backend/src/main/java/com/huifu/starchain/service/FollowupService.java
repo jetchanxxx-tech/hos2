@@ -22,6 +22,8 @@ public class FollowupService {
 
     private final FollowupTaskRepository taskRepo;
 
+    public FollowupService(FollowupTaskRepository taskRepo) { this.taskRepo = taskRepo; }
+
     public PageResult<FollowupTask> getButlerTasks(Long butlerId, String status, int page, int size) {
         var pg = taskRepo.findByAssignedButlerIdAndStatusOrderByScheduledDateAsc(
                 butlerId, status != null ? status : "PENDING", PageRequest.of(page - 1, size));

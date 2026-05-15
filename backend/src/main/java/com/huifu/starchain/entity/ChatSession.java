@@ -66,4 +66,10 @@ import java.time.LocalDateTime;
     public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
     public Integer getSatisfactionScore() { return satisfactionScore; }
     public void setSatisfactionScore(Integer satisfactionScore) { this.satisfactionScore = satisfactionScore; }
+    public String getChannel() { return channel; }
+    public void setChannel(String channel) { this.channel = channel; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getEscalationLevel() { return escalationLevel; }
+    public void setEscalationLevel(String escalationLevel) { this.escalationLevel = escalationLevel; }
 }

@@ -18,5 +18,5 @@ public interface KnowledgeArticleRepository extends JpaRepository<KnowledgeArtic
     List<KnowledgeArticle> searchByFulltext(String keyword, int limit);
 
     @Query("SELECT ka FROM KnowledgeArticle ka WHERE ka.status = 'PUBLISHED' AND (ka.question LIKE %:keyword% OR ka.title LIKE %:keyword%)")
-    List<KnowledgeArticle> searchByKeyword(String keyword, Pageable pageable);
+    Page<KnowledgeArticle> searchByKeyword(String keyword, Pageable pageable);
 }

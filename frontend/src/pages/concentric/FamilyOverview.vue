@@ -21,6 +21,11 @@ const relationshipMap: Record<string, string> = {
   SELF: '本人', SPOUSE: '配偶', CHILD: '子女', PARENT: '父母', OTHER: '其他',
 }
 const shareMap: Record<string, string> = { ALL: '全部共享', REPORT_ONLY: '仅报告', BASIC_ONLY: '仅基础信息', NONE: '不共享' }
+
+async function handleCreateFamily() {
+  await userApi.createFamily('我的家庭')
+  location.reload()
+}
 </script>
 
 <template>
@@ -59,7 +64,7 @@ const shareMap: Record<string, string> = { ALL: '全部共享', REPORT_ONLY: '�
 
     <div v-else class="empty-card">
       <p>暂未创建家庭</p>
-      <button class="btn btn-primary" @click="userApi.createFamily('我的家庭').then(() => location.reload())">
+      <button class="btn btn-primary" @click="handleCreateFamily">
         创建家庭
       </button>
     </div>

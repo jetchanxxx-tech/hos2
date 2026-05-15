@@ -17,6 +17,8 @@ public class FollowupController {
 
     private final FollowupService followupService;
 
+    public FollowupController(FollowupService followupService) { this.followupService = followupService; }
+
     @GetMapping("/butler")
     public ApiResponse<PageResult<FollowupTask>> butlerTasks(
             @AuthenticationPrincipal Long userId,

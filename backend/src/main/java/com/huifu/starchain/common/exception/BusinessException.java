@@ -19,12 +19,10 @@ public class BusinessException extends RuntimeException {
     public BusinessException(BizError error) {
         super(error.getMessage());
         this.code = error.getCode();
-        this.message = error.getMessage();
     }
 
     public BusinessException(BizError error, String detail) {
         super(error.getMessage() + ": " + detail);
         this.code = error.getCode();
-        this.message = error.getMessage() + ": " + detail;
     }
 }
