@@ -130,15 +130,6 @@ check_nodejs() {
     return 1
 }
 
-check_nginx() {
-    if command -v nginx &>/dev/null; then
-        log "Nginx $(nginx -v 2>&1 | grep -oP '\d+\.\d+\.\d+') 已安装"
-        return 0
-    fi
-    warn "Nginx 未安装"
-    return 1
-}
-
 check_mysql() {
     if [ "${MYSQL_HOST:-localhost}" != "localhost" ]; then
         log "MySQL 远程主机: ${MYSQL_HOST}，跳过本地检测"
@@ -267,33 +258,6 @@ install_nodejs() {
     esac
     check_nodejs || { err "Node.js 安装后验证失败"; return 1; }
     log "Node.js 安装完成"
-}
-
-install_nginx() {
-    check_nginx && return 0
-    info "安装 Nginx..."
-    case $OS_FAMILY in
-        debian)
-            apt-get update -qq
-            apt-get install -y -qq nginx || { err "Nginx 安装失败"; return 1; }
-            ;;
-        rhel)
-            if command -v dnf &>/dev/null; then
-                dnf install -y -q epel-release 2>/dev/null || true
-                dnf install -y -q nginx || { err "Nginx 安装失败"; return 1; }
-            else
-                yum install -y -q epel-release 2>/dev/null || true
-                yum install -y -q nginx || { err "Nginx 安装失败"; return 1; }
-            fi
-            # SELinux: 允许 nginx 反代
-            if command -v setsebool &>/dev/null; then
-                setsebool -P httpd_can_network_connect 1 2>/dev/null || true
-            fi
-            ;;
-        *) err "不支持自动安装 Nginx"; return 1 ;;
-    esac
-    check_nginx || { err "Nginx 安装后验证失败"; return 1; }
-    log "Nginx 安装完成"
 }
 
 install_mysql() {
@@ -734,7 +698,6 @@ main() {
         install_java    || true
         install_maven   || true
         install_nodejs  || true
-        install_nginx   || true
         install_mysql   || true
         install_redis   || true
         install_minio   || true
