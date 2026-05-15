@@ -45,6 +45,16 @@ export const userApi = {
   getFamily: (id: number) => api.get(`/families/${id}`),
   createFamily: (familyName: string) => api.post('/families', null, { params: { familyName } }),
   getFamilyMembers: (id: number) => api.get(`/families/${id}/members`),
+  addFamilyMember: (id: number, userId: number, relationship: string, shareScope: string) =>
+    api.post(`/families/${id}/members`, null, { params: { userId, relationship, shareScope } }),
+  removeFamilyMember: (familyId: number, memberUserId: number) =>
+    api.delete(`/families/${familyId}/members/${memberUserId}`),
+  updateShareScope: (familyId: number, memberUserId: number, shareScope: string) =>
+    api.put(`/families/${familyId}/members/${memberUserId}/share-scope`, null, { params: { shareScope } }),
+  toggleEmergency: (familyId: number, memberUserId: number) =>
+    api.put(`/families/${familyId}/members/${memberUserId}/emergency`),
+  dissolveFamily: (id: number) => api.delete(`/families/${id}`),
+  searchUsers: (keyword: string) => api.get('/users', { params: { keyword, size: 10 } }),
 }
 
 // ---- Health Records ----

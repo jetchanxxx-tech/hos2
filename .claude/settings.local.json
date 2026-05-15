@@ -5,7 +5,12 @@
       "Bash(python -u -c ' *)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(bash -n deploy/auto-deploy.sh)",
+      "Bash(bash -n deploy/scripts/deploy.sh)",
+      "Bash(export JAVA_HOME=\"C:/Program Files/Java/jdk-21\")",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$HOME/tools/apache-maven-3.9.9/bin:$PATH\")",
+      "Bash(mvn clean *)"
     ]
   }
 }

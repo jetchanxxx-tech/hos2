@@ -5,13 +5,14 @@ import com.huifu.starchain.common.exception.BusinessException;
 import com.huifu.starchain.config.CryptoConfig.CryptoUtil;
 import com.huifu.starchain.config.jwt.JwtUtil;
 import com.huifu.starchain.dto.auth.*;
-import com.huifu.starchain.entity.User;
-import com.huifu.starchain.repository.UserRepository;
+import com.huifu.starchain.entity.*;
+import com.huifu.starchain.repository.*;
 
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -27,8 +28,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final CryptoUtil cryptoUtil;
+    private final FamilyRepository familyRepo;
+    private final FamilyMemberRepository familyMemberRepo;
 
-    public AuthService(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, CryptoUtil cryptoUtil) { this.userRepo = userRepo; this.passwordEncoder = passwordEncoder; this.jwtUtil = jwtUtil; this.cryptoUtil = cryptoUtil; }
+    public AuthService(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, CryptoUtil cryptoUtil, FamilyRepository familyRepo, FamilyMemberRepository familyMemberRepo) { this.userRepo = userRepo; this.passwordEncoder = passwordEncoder; this.jwtUtil = jwtUtil; this.cryptoUtil = cryptoUtil; this.familyRepo = familyRepo; this.familyMemberRepo = familyMemberRepo; }
 
     @Transactional
     public LoginResponse register(RegisterRequest req) {
@@ -45,7 +48,27 @@ public class AuthService {
         user.setRole(User.UserRole.RESIDENT);
         user.setStatus(User.UserStatus.ACTIVE);
         user.setDataAuthConsent(1);
-        user = userRepo.save(user);
+        User savedUser = userRepo.save(user);
+
+        // 邀请码：注册时自动加入对应家庭
+        if (StringUtils.hasText(req.inviteCode())) {
+            var familyOpt = familyRepo.findByInviteCode(req.inviteCode());
+            if (familyOpt.isPresent()) {
+                var family = familyOpt.get();
+                FamilyMember fm = new FamilyMember();
+                fm.setFamilyId(family.getId());
+                fm.setUserId(savedUser.getId());
+                fm.setRelationship(FamilyMember.Relationship.OTHER);
+                fm.setShareScope("BASIC_ONLY");
+                fm.setIsEmergencyContact(false);
+                familyMemberRepo.save(fm);
+                savedUser.setFamilyId(family.getId());
+                userRepo.save(savedUser);
+                family.setMemberCount((int) familyMemberRepo.countByFamilyId(family.getId()));
+                familyRepo.save(family);
+            }
+        }
+
         String token = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getRole().name());
         return buildLoginResponse(user, token, refreshToken);

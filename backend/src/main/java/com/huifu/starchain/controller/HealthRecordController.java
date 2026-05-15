@@ -6,6 +6,7 @@ import com.huifu.starchain.entity.HealthRecord;
 import com.huifu.starchain.entity.LabReport;
 import com.huifu.starchain.service.HealthRecordService;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,19 +24,21 @@ public class HealthRecordController {
 
     @GetMapping
     public ApiResponse<PageResult<HealthRecord>> getTimeline(
+            @AuthenticationPrincipal Long requesterUserId,
             @RequestParam Long userId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String recordType) {
-        return ApiResponse.ok(recordService.getTimeline(userId, page, size, recordType));
+        return ApiResponse.ok(recordService.getTimeline(requesterUserId, userId, page, size, recordType));
     }
 
     @GetMapping("/range")
     public ApiResponse<List<HealthRecord>> getTimelineByRange(
+            @AuthenticationPrincipal Long requesterUserId,
             @RequestParam Long userId,
             @RequestParam LocalDate from,
             @RequestParam LocalDate to) {
-        return ApiResponse.ok(recordService.getTimelineByDateRange(userId, from, to));
+        return ApiResponse.ok(recordService.getTimelineByDateRange(requesterUserId, userId, from, to));
     }
 
     @GetMapping("/{id}")
@@ -49,13 +52,17 @@ public class HealthRecordController {
     }
 
     @GetMapping("/abnormal")
-    public ApiResponse<List<HealthRecord>> getAbnormal(@RequestParam Long userId) {
-        return ApiResponse.ok(recordService.getAbnormalRecords(userId));
+    public ApiResponse<List<HealthRecord>> getAbnormal(
+            @AuthenticationPrincipal Long requesterUserId,
+            @RequestParam Long userId) {
+        return ApiResponse.ok(recordService.getAbnormalRecords(requesterUserId, userId));
     }
 
     @GetMapping("/{id}/reports")
-    public ApiResponse<List<LabReport>> getReports(@PathVariable Long id) {
-        return ApiResponse.ok(recordService.getReportsByRecord(id));
+    public ApiResponse<List<LabReport>> getReports(
+            @AuthenticationPrincipal Long requesterUserId,
+            @PathVariable Long id) {
+        return ApiResponse.ok(recordService.getReportsByRecord(requesterUserId, id));
     }
 
     @GetMapping("/trends/{indicatorCode}")

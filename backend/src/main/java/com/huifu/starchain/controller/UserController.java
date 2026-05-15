@@ -87,4 +87,27 @@ class FamilyController {
         userService.removeFamilyMember(id, memberUserId);
         return ApiResponse.ok();
     }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> dissolveFamily(@PathVariable Long id, @AuthenticationPrincipal Long userId) {
+        userService.dissolveFamily(id, userId);
+        return ApiResponse.ok();
+    }
+
+    @PutMapping("/{id}/members/{memberUserId}/share-scope")
+    public ApiResponse<FamilyMember> updateShareScope(
+            @PathVariable Long id,
+            @PathVariable Long memberUserId,
+            @RequestParam String shareScope,
+            @AuthenticationPrincipal Long userId) {
+        return ApiResponse.ok(userService.updateMemberShareScope(id, memberUserId, shareScope, userId));
+    }
+
+    @PutMapping("/{id}/members/{memberUserId}/emergency")
+    public ApiResponse<FamilyMember> toggleEmergency(
+            @PathVariable Long id,
+            @PathVariable Long memberUserId,
+            @AuthenticationPrincipal Long userId) {
+        return ApiResponse.ok(userService.toggleEmergencyContact(id, memberUserId, userId));
+    }
 }

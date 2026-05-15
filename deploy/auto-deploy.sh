@@ -397,7 +397,7 @@ REDIS_PORT=6379
 MINIO_HOST=localhost
 MYSQL_ROOT_PASSWORD=nishi250
 MYSQL_PASSWORD=nishi250
-REDIS_PASSWORD=$(openssl rand -base64 16)
+REDIS_PASSWORD=nishi250
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=$(openssl rand -base64 24)
 JWT_SECRET=$(openssl rand -base64 48)
@@ -490,9 +490,23 @@ init_database() {
         MYSQL_CMD="mysql -u root -p${MYSQL_ROOT_PASSWORD}"
     fi
 
+    # 检测 MySQL 版本，5.x 强制 mysql_native_password（JDBC 兼容）
+    local MYSQL_VER=$($MYSQL_CMD -e "SELECT VERSION();" -s -N 2>/dev/null)
+    info "MySQL 版本: ${MYSQL_VER:-unknown}"
+    local AUTH_CLAUSE=""
+    if echo "${MYSQL_VER}" | grep -q "^5\."; then
+        AUTH_CLAUSE="WITH mysql_native_password"
+        info "MySQL 5.x 检测到，强制 mysql_native_password"
+    fi
+
     info "初始化数据库..."
     $MYSQL_CMD -e "CREATE DATABASE IF NOT EXISTS huifu_starchain CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null
-    $MYSQL_CMD -e "CREATE USER IF NOT EXISTS 'huifu'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';" 2>/dev/null
+    # 同时创建 localhost 和 127.0.0.1（JDBC 走 TCP，需要两个 host）
+    $MYSQL_CMD -e "DROP USER IF EXISTS 'huifu'@'127.0.0.1';" 2>/dev/null
+    $MYSQL_CMD -e "DROP USER IF EXISTS 'huifu'@'localhost';" 2>/dev/null
+    $MYSQL_CMD -e "CREATE USER 'huifu'@'127.0.0.1' IDENTIFIED ${AUTH_CLAUSE} BY '${MYSQL_PASSWORD}';" 2>/dev/null
+    $MYSQL_CMD -e "CREATE USER 'huifu'@'localhost' IDENTIFIED ${AUTH_CLAUSE} BY '${MYSQL_PASSWORD}';" 2>/dev/null
+    $MYSQL_CMD -e "GRANT ALL PRIVILEGES ON huifu_starchain.* TO 'huifu'@'127.0.0.1';" 2>/dev/null
     $MYSQL_CMD -e "GRANT ALL PRIVILEGES ON huifu_starchain.* TO 'huifu'@'localhost'; FLUSH PRIVILEGES;" 2>/dev/null
     log "数据库初始化完成（Flyway 迁移由 API 启动时自动执行）"
 }

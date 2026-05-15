@@ -110,6 +110,50 @@ public class UserService {
         familyRepo.save(family);
     }
 
+    @Transactional
+    public void dissolveFamily(Long familyId, Long requesterUserId) {
+        Family family = getFamily(familyId);
+        if (!family.getPrimaryUserId().equals(requesterUserId)) {
+            throw new BusinessException(BizError.FORBIDDEN);
+        }
+        long memberCount = familyMemberRepo.countByFamilyId(familyId);
+        if (memberCount > 1) {
+            throw new BusinessException(409, "请先移除所有成员后再解散家庭");
+        }
+        // 清除最后一名成员(主账号)的关联
+        familyMemberRepo.deleteByFamilyIdAndUserId(familyId, requesterUserId);
+        User user = getUserById(requesterUserId);
+        user.setFamilyId(null);
+        userRepo.save(user);
+        family.setStatus(Family.FamilyStatus.DISSOLVED);
+        family.setMemberCount(0);
+        familyRepo.save(family);
+    }
+
+    @Transactional
+    public FamilyMember updateMemberShareScope(Long familyId, Long memberUserId, String shareScope, Long requesterUserId) {
+        Family family = getFamily(familyId);
+        if (!family.getPrimaryUserId().equals(requesterUserId)) {
+            throw new BusinessException(BizError.FORBIDDEN);
+        }
+        FamilyMember fm = familyMemberRepo.findByFamilyIdAndUserId(familyId, memberUserId)
+                .orElseThrow(() -> new BusinessException(BizError.NOT_FOUND));
+        fm.setShareScope(shareScope);
+        return familyMemberRepo.save(fm);
+    }
+
+    @Transactional
+    public FamilyMember toggleEmergencyContact(Long familyId, Long memberUserId, Long requesterUserId) {
+        Family family = getFamily(familyId);
+        if (!family.getPrimaryUserId().equals(requesterUserId)) {
+            throw new BusinessException(BizError.FORBIDDEN);
+        }
+        FamilyMember fm = familyMemberRepo.findByFamilyIdAndUserId(familyId, memberUserId)
+                .orElseThrow(() -> new BusinessException(BizError.NOT_FOUND));
+        fm.setIsEmergencyContact(!Boolean.TRUE.equals(fm.getIsEmergencyContact()));
+        return familyMemberRepo.save(fm);
+    }
+
     public List<FamilyMember> getFamilyMembers(Long familyId) {
         return familyMemberRepo.findByFamilyId(familyId);
     }
