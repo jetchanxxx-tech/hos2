@@ -34,16 +34,15 @@ public class AuthService {
         if (userRepo.findByPhoneHash(phoneHash).isPresent()) {
             throw new BusinessException(BizError.PHONE_ALREADY_EXISTS);
         }
-        User user = User.builder()
-                .phone(cryptoUtil.encrypt(req.phone()))
-                .phoneHash(phoneHash)
-                .nameMasked(cryptoUtil.maskName(req.name()))
-                .realName(cryptoUtil.encrypt(req.name()))
-                .openid(req.openid())
-                .role(User.UserRole.RESIDENT)
-                .status(User.UserStatus.ACTIVE)
-                .dataAuthConsent(1)
-                .build();
+        User user = new User();
+        user.setPhone(cryptoUtil.encrypt(req.phone()));
+        user.setPhoneHash(phoneHash);
+        user.setNameMasked(cryptoUtil.maskName(req.name()));
+        user.setRealName(cryptoUtil.encrypt(req.name()));
+        user.setOpenid(req.openid());
+        user.setRole(User.UserRole.RESIDENT);
+        user.setStatus(User.UserStatus.ACTIVE);
+        user.setDataAuthConsent(1);
         user = userRepo.save(user);
         String token = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getRole().name());
@@ -85,25 +84,12 @@ public class AuthService {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new BusinessException(BizError.USER_NOT_FOUND));
         String newToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
-        return LoginResponse.builder()
-                .accessToken(newToken)
-                .refreshToken(refreshToken)
-                .expiresIn(7200)
-                .build();
+        return new LoginResponse(newToken, refreshToken, 7200, null);
     }
 
     private LoginResponse buildLoginResponse(User user, String token, String refreshToken) {
-        return LoginResponse.builder()
-                .accessToken(token)
-                .refreshToken(refreshToken)
-                .expiresIn(7200)
-                .user(LoginResponse.UserInfo.builder()
-                        .id(user.getId())
-                        .name(user.getNameMasked())
-                        .role(user.getRole().name())
-                        .avatarUrl(user.getAvatarUrl())
-                        .build())
-                .build();
+        var userInfo = new LoginResponse.UserInfo(user.getId(), user.getNameMasked(), user.getRole().name(), user.getAvatarUrl());
+        return new LoginResponse(token, refreshToken, 7200, userInfo);
     }
 
     private static String sha256(String input) {

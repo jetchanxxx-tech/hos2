@@ -58,18 +58,17 @@ public class ServicePackageService {
         BigDecimal actualAmount = pkg.getDiscountPrice() != null ? pkg.getDiscountPrice() : pkg.getPrice();
         String orderNo = "HF" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + String.format("%04d", System.currentTimeMillis() % 10000);
-        PackageOrder order = PackageOrder.builder()
-                .orderNo(orderNo)
-                .userId(userId)
-                .packageId(packageId)
-                .amount(actualAmount)
-                .originalAmount(pkg.getPrice())
-                .status("PAID") // Simplified: auto-paid for demo
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(pkg.getDurationDays()))
-                .paidAt(LocalDateTime.now())
-                .paymentMethod("WECHAT_PAY")
-                .build();
+        PackageOrder order = new PackageOrder();
+        order.setOrderNo(orderNo);
+        order.setUserId(userId);
+        order.setPackageId(packageId);
+        order.setAmount(actualAmount);
+        order.setOriginalAmount(pkg.getPrice());
+        order.setStatus("PAID");
+        order.setStartDate(LocalDate.now());
+        order.setEndDate(LocalDate.now().plusDays(pkg.getDurationDays()));
+        order.setPaidAt(LocalDateTime.now());
+        order.setPaymentMethod("WECHAT_PAY");
         return orderRepo.save(order);
     }
 
@@ -93,18 +92,17 @@ public class ServicePackageService {
         BenefitRedemption redemption = redemptionRepo.findByUserIdAndBenefitType(userId, benefitType)
                 .stream().findFirst().orElse(null);
         if (redemption == null) {
-            redemption = BenefitRedemption.builder()
-                    .orderId(orderId)
-                    .packageId(order.getPackageId())
-                    .userId(userId)
-                    .benefitType(benefitType)
-                    .benefitName(benefitType)
-                    .totalCount(1)
-                    .usedCount(1)
-                    .status("PARTIALLY_USED")
-                    .redeemedBy(butlerId)
-                    .redeemedAt(LocalDateTime.now())
-                    .build();
+            redemption = new BenefitRedemption();
+            redemption.setOrderId(orderId);
+            redemption.setPackageId(order.getPackageId());
+            redemption.setUserId(userId);
+            redemption.setBenefitType(benefitType);
+            redemption.setBenefitName(benefitType);
+            redemption.setTotalCount(1);
+            redemption.setUsedCount(1);
+            redemption.setStatus("PARTIALLY_USED");
+            redemption.setRedeemedBy(butlerId);
+            redemption.setRedeemedAt(LocalDateTime.now());
         } else {
             if (redemption.getUsedCount() >= redemption.getTotalCount()) {
                 throw new BusinessException(BizError.BENEFIT_EXHAUSTED);

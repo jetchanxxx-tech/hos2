@@ -1,16 +1,12 @@
 package com.huifu.starchain.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "service_packages")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
-public class ServicePackage extends BaseEntity {
+@Getter @NoArgsConstructor public class ServicePackage extends BaseEntity {
 
     @Column(name = "name", nullable = false, length = 128)
     private String name;
@@ -22,8 +18,7 @@ public class ServicePackage extends BaseEntity {
     private String type;
 
     @Column(name = "category", nullable = false, length = 32)
-    @Builder.Default
-    private String category = "MATERNITY";
+        private String category = "MATERNITY";
 
     @Column(name = "price", nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
@@ -32,12 +27,10 @@ public class ServicePackage extends BaseEntity {
     private BigDecimal discountPrice;
 
     @Column(name = "duration_days")
-    @Builder.Default
-    private Integer durationDays = 365;
+        private Integer durationDays = 365;
 
     @Column(name = "max_beneficiaries")
-    @Builder.Default
-    private Integer maxBeneficiaries = 1;
+        private Integer maxBeneficiaries = 1;
 
     @Column(name = "cover_image_url", length = 512)
     private String coverImageUrl;
@@ -50,15 +43,35 @@ public class ServicePackage extends BaseEntity {
 
     @Column(name = "status", nullable = false, length = 16)
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private PkgStatus status = PkgStatus.DRAFT;
+        private PkgStatus status = PkgStatus.DRAFT;
 
     @Column(name = "sort_order")
-    @Builder.Default
-    private Integer sortOrder = 0;
+        private Integer sortOrder = 0;
 
     @Column(name = "created_by")
     private Long createdBy;
+
+    public ServicePackage() {}
+
+    // ---- Getters & Setters ----
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getSubtitle() { return subtitle; }
+    public void setSubtitle(String subtitle) { this.subtitle = subtitle; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
+    public BigDecimal getDiscountPrice() { return discountPrice; }
+    public void setDiscountPrice(BigDecimal discountPrice) { this.discountPrice = discountPrice; }
+    public String getCoverImageUrl() { return coverImageUrl; }
+    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
+    public String getBenefitsJson() { return benefitsJson; }
+    public void setBenefitsJson(String benefitsJson) { this.benefitsJson = benefitsJson; }
+    public String getTermsText() { return termsText; }
+    public void setTermsText(String termsText) { this.termsText = termsText; }
+    public Long getCreatedBy() { return createdBy; }
+    public void setCreatedBy(Long createdBy) { this.createdBy = createdBy; }
 
     public enum PkgStatus { DRAFT, ON_SHELF, OFF_SHELF }
 }

@@ -1,66 +1,47 @@
 package com.huifu.starchain.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 
     private int code;
     private String message;
     private T data;
-    private String traceId;
 
-    @Builder.Default
-    private long timestamp = Instant.now().toEpochMilli();
+    public ApiResponse() {}
+
+    public ApiResponse(int code, String message, T data) {
+        this.code = code; this.message = message; this.data = data;
+    }
+
+    public int getCode() { return code; }
+    public void setCode(int code) { this.code = code; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
 
     // ---- Success ----
     public static <T> ApiResponse<T> ok(T data) {
-        return ApiResponse.<T>builder()
-                .code(200)
-                .message("OK")
-                .data(data)
-                .build();
+        return new ApiResponse<>(200, "OK", data);
     }
 
     public static <T> ApiResponse<T> ok(String message, T data) {
-        return ApiResponse.<T>builder()
-                .code(200)
-                .message(message)
-                .data(data)
-                .build();
+        return new ApiResponse<>(200, message, data);
     }
 
     public static ApiResponse<Void> ok() {
-        return ApiResponse.<Void>builder()
-                .code(200)
-                .message("OK")
-                .build();
+        return new ApiResponse<>(200, "OK", null);
     }
 
     // ---- Error ----
     public static <T> ApiResponse<T> error(int code, String message) {
-        return ApiResponse.<T>builder()
-                .code(code)
-                .message(message)
-                .build();
+        return new ApiResponse<>(code, message, null);
     }
 
     // ---- Paged ----
     public static <T> ApiResponse<PageResult<T>> page(PageResult<T> pageResult) {
-        return ApiResponse.<PageResult<T>>builder()
-                .code(200)
-                .message("OK")
-                .data(pageResult)
-                .build();
+        return new ApiResponse<>(200, "OK", pageResult);
     }
 }

@@ -1,23 +1,18 @@
 package com.huifu.starchain.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chat_messages")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
-public class ChatMessage extends BaseEntity {
+@Getter @NoArgsConstructor public class ChatMessage extends BaseEntity {
 
     @Column(name = "session_id", nullable = false)
     private Long sessionId;
 
     @Column(name = "seq_no", nullable = false)
-    @Builder.Default
-    private Integer seqNo = 0;
+        private Integer seqNo = 0;
 
     @Column(name = "sender_type", nullable = false, length = 16)
     private String senderType;
@@ -29,8 +24,7 @@ public class ChatMessage extends BaseEntity {
     private String senderName;
 
     @Column(name = "msg_type", nullable = false, length = 16)
-    @Builder.Default
-    private String msgType = "TEXT";
+        private String msgType = "TEXT";
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
@@ -45,8 +39,7 @@ public class ChatMessage extends BaseEntity {
     private String extraJson;
 
     @Column(name = "trigger_alert")
-    @Builder.Default
-    private Boolean triggerAlert = false;
+        private Boolean triggerAlert = false;
 
     @Column(name = "alert_keyword", length = 128)
     private String alertKeyword;
@@ -55,9 +48,34 @@ public class ChatMessage extends BaseEntity {
     private String aiAnswerSource;
 
     @Column(name = "is_read")
-    @Builder.Default
-    private Boolean isRead = false;
+        private Boolean isRead = false;
 
     @Column(name = "read_at")
     private LocalDateTime readAt;
+
+    public ChatMessage() {}
+
+    // ---- Getters & Setters ----
+    public Long getSessionId() { return sessionId; }
+    public void setSessionId(Long sessionId) { this.sessionId = sessionId; }
+    public String getSenderType() { return senderType; }
+    public void setSenderType(String senderType) { this.senderType = senderType; }
+    public Long getSenderId() { return senderId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
+    public String getSenderName() { return senderName; }
+    public void setSenderName(String senderName) { this.senderName = senderName; }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+    public String getMediaUrl() { return mediaUrl; }
+    public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
+    public String getMediaMetaJson() { return mediaMetaJson; }
+    public void setMediaMetaJson(String mediaMetaJson) { this.mediaMetaJson = mediaMetaJson; }
+    public String getExtraJson() { return extraJson; }
+    public void setExtraJson(String extraJson) { this.extraJson = extraJson; }
+    public String getAlertKeyword() { return alertKeyword; }
+    public void setAlertKeyword(String alertKeyword) { this.alertKeyword = alertKeyword; }
+    public String getAiAnswerSource() { return aiAnswerSource; }
+    public void setAiAnswerSource(String aiAnswerSource) { this.aiAnswerSource = aiAnswerSource; }
+    public LocalDateTime getReadAt() { return readAt; }
+    public void setReadAt(LocalDateTime readAt) { this.readAt = readAt; }
 }

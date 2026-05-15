@@ -1,17 +1,13 @@
 package com.huifu.starchain.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "health_records")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
-public class HealthRecord extends BaseEntity {
+@Getter @NoArgsConstructor public class HealthRecord extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -38,8 +34,7 @@ public class HealthRecord extends BaseEntity {
     private String detailJson;
 
     @Column(name = "source", nullable = false, length = 16)
-    @Builder.Default
-    private String source = "MANUAL";
+        private String source = "MANUAL";
 
     @Column(name = "source_ref_id", length = 128)
     private String sourceRefId;
@@ -51,17 +46,42 @@ public class HealthRecord extends BaseEntity {
     private String attendingDoctor;
 
     @Column(name = "abnormal_flag")
-    @Builder.Default
-    private Integer abnormalFlag = 0;
+        private Integer abnormalFlag = 0;
 
     @Column(name = "alert_triggered")
-    @Builder.Default
-    private Boolean alertTriggered = false;
+        private Boolean alertTriggered = false;
 
     @Column(name = "tags_json", columnDefinition = "JSON")
     private String tagsJson;
 
+    public HealthRecord() {}
+
+    // ---- Getters & Setters ----
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public String getRecordType() { return recordType; }
+    public void setRecordType(String recordType) { this.recordType = recordType; }
+    public LocalDate getEventDate() { return eventDate; }
+    public void setEventDate(LocalDate eventDate) { this.eventDate = eventDate; }
+    public LocalTime getEventTime() { return eventTime; }
+    public void setEventTime(LocalTime eventTime) { this.eventTime = eventTime; }
+    public String getGestationalWeek() { return gestationalWeek; }
+    public void setGestationalWeek(String gestationalWeek) { this.gestationalWeek = gestationalWeek; }
+    public String getEventTitle() { return eventTitle; }
+    public void setEventTitle(String eventTitle) { this.eventTitle = eventTitle; }
+    public String getEventSummary() { return eventSummary; }
+    public void setEventSummary(String eventSummary) { this.eventSummary = eventSummary; }
+    public String getDetailJson() { return detailJson; }
+    public void setDetailJson(String detailJson) { this.detailJson = detailJson; }
+    public String getSourceRefId() { return sourceRefId; }
+    public void setSourceRefId(String sourceRefId) { this.sourceRefId = sourceRefId; }
+    public String getHospitalDept() { return hospitalDept; }
+    public void setHospitalDept(String hospitalDept) { this.hospitalDept = hospitalDept; }
+    public String getAttendingDoctor() { return attendingDoctor; }
+    public void setAttendingDoctor(String attendingDoctor) { this.attendingDoctor = attendingDoctor; }
+    public String getTagsJson() { return tagsJson; }
+    public void setTagsJson(String tagsJson) { this.tagsJson = tagsJson; }
+
     @Column(name = "is_deleted")
-    @Builder.Default
-    private Boolean isDeleted = false;
+        private Boolean isDeleted = false;
 }

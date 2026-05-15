@@ -57,21 +57,19 @@ public class UserService {
         if (user.getFamilyId() != null) {
             throw new BusinessException(409, "用户已有所属家庭");
         }
-        Family family = Family.builder()
-                .familyName(familyName)
-                .primaryUserId(userId)
-                .memberCount(1)
-                .inviteCode(generateInviteCode())
-                .build();
+        Family family = new Family();
+        family.setFamilyName(familyName);
+        family.setPrimaryUserId(userId);
+        family.setMemberCount(1);
+        family.setInviteCode(generateInviteCode());
         family = familyRepo.save(family);
         user.setFamilyId(family.getId());
         userRepo.save(user);
-        FamilyMember member = FamilyMember.builder()
-                .familyId(family.getId())
-                .userId(userId)
-                .relationship(FamilyMember.Relationship.SELF)
-                .shareScope("ALL")
-                .build();
+        FamilyMember member = new FamilyMember();
+        member.setFamilyId(family.getId());
+        member.setUserId(userId);
+        member.setRelationship(FamilyMember.Relationship.SELF);
+        member.setShareScope("ALL");
         familyMemberRepo.save(member);
         return family;
     }

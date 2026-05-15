@@ -1,16 +1,12 @@
 package com.huifu.starchain.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "lab_reports")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
-public class LabReport extends BaseEntity {
+@Getter @NoArgsConstructor public class LabReport extends BaseEntity {
 
     @Column(name = "health_record_id", nullable = false)
     private Long healthRecordId;
@@ -34,8 +30,7 @@ public class LabReport extends BaseEntity {
     private String referenceRange;
 
     @Column(name = "is_abnormal")
-    @Builder.Default
-    private Integer isAbnormal = 0;
+        private Integer isAbnormal = 0;
 
     @Column(name = "abnormal_direction", length = 8)
     private String abnormalDirection;
@@ -48,4 +43,30 @@ public class LabReport extends BaseEntity {
 
     @Column(name = "trend_data_json", columnDefinition = "JSON")
     private String trendDataJson;
+
+    public LabReport() {}
+
+    // ---- Getters & Setters ----
+    public Long getHealthRecordId() { return healthRecordId; }
+    public void setHealthRecordId(Long healthRecordId) { this.healthRecordId = healthRecordId; }
+    public String getReportType() { return reportType; }
+    public void setReportType(String reportType) { this.reportType = reportType; }
+    public String getIndicatorName() { return indicatorName; }
+    public void setIndicatorName(String indicatorName) { this.indicatorName = indicatorName; }
+    public String getIndicatorCode() { return indicatorCode; }
+    public void setIndicatorCode(String indicatorCode) { this.indicatorCode = indicatorCode; }
+    public String getResultValue() { return resultValue; }
+    public void setResultValue(String resultValue) { this.resultValue = resultValue; }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getReferenceRange() { return referenceRange; }
+    public void setReferenceRange(String referenceRange) { this.referenceRange = referenceRange; }
+    public String getAbnormalDirection() { return abnormalDirection; }
+    public void setAbnormalDirection(String abnormalDirection) { this.abnormalDirection = abnormalDirection; }
+    public LocalDate getReportDate() { return reportDate; }
+    public void setReportDate(LocalDate reportDate) { this.reportDate = reportDate; }
+    public String getMachineInfo() { return machineInfo; }
+    public void setMachineInfo(String machineInfo) { this.machineInfo = machineInfo; }
+    public String getTrendDataJson() { return trendDataJson; }
+    public void setTrendDataJson(String trendDataJson) { this.trendDataJson = trendDataJson; }
 }

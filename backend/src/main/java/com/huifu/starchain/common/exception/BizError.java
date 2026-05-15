@@ -1,12 +1,13 @@
 package com.huifu.starchain.common.exception;
 
-import lombok.Getter;
 
-@Getter
 public class BizError {
 
     private final int code;
     private final String message;
+
+    public int getCode() { return code; }
+    public String getMessage() { return message; }
 
     private BizError(int code, String message) {
         this.code = code;
