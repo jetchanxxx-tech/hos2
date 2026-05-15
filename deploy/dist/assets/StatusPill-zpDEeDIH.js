@@ -1,0 +1,1 @@
+import{k as a,q as e,f as l,m as o,v as c,_ as n}from"./index-DnB7MKVf.js";const r=a({__name:"StatusPill",props:{status:{}},setup(s){return(t,p)=>(e(),l("span",{class:o(["pill",`pill-${s.status}`])},[c(t.$slots,"default",{},void 0)],2))}}),i=n(r,[["__scopeId","data-v-c42bc59c"]]);export{i as S};

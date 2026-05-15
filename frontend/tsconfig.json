@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "useDefineForEmit": true,
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
@@ -15,9 +14,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "paths": { "@/*": ["./src/*"] },
-    "types": ["node"]
+    "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "env.d.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "env.d.ts"]
 }

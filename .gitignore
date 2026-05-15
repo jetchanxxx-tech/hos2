@@ -23,7 +23,7 @@ frontend/.vite/
 
 # Deploy
 deploy/.env
-deploy/dist/
+#deploy/dist/
 deploy/nginx/ssl/
 
 # Temp
