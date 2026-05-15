@@ -3,7 +3,7 @@ package com.huifu.starchain.config.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
 
-@Slf4j
+
 @Component
 public class JwtUtil {
 
@@ -19,6 +19,8 @@ public class JwtUtil {
     private final long accessExpiration;
     private final long refreshExpiration;
     private final String issuer;
+
+    public JwtUtil(SecretKey key, long accessExpiration, long refreshExpiration, String issuer) { this.key = key; this.accessExpiration = accessExpiration; this.refreshExpiration = refreshExpiration; this.issuer = issuer; }
 
     public JwtUtil(
             @Value("${jwt.secret}") String secret,

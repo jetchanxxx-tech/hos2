@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chat_messages")
-@Getter @NoArgsConstructor public class ChatMessage extends BaseEntity {
+  public class ChatMessage extends BaseEntity {
 
     @Column(name = "session_id", nullable = false)
     private Long sessionId;

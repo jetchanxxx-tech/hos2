@@ -3,7 +3,7 @@ package com.huifu.starchain.service;
 import com.huifu.starchain.entity.DashboardCache;
 import com.huifu.starchain.entity.User;
 import com.huifu.starchain.repository.*;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,13 +12,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
+
 public class DashboardService {
 
     private final DashboardCacheRepository cacheRepo;
     private final UserRepository userRepo;
     private final PackageOrderRepository orderRepo;
     private final FollowupTaskRepository followupRepo;
+
+    public DashboardService(DashboardCacheRepository cacheRepo, UserRepository userRepo, PackageOrderRepository orderRepo, FollowupTaskRepository followupRepo) { this.cacheRepo = cacheRepo; this.userRepo = userRepo; this.orderRepo = orderRepo; this.followupRepo = followupRepo; }
 
     public Map<String, Object> getKpiSummary() {
         LocalDate monthStart = LocalDate.now().withDayOfMonth(1);

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "followup_tasks")
-@Getter @NoArgsConstructor public class FollowupTask extends BaseEntity {
+  public class FollowupTask extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;

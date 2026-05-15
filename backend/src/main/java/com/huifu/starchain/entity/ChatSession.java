@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chat_sessions")
-@Getter @NoArgsConstructor public class ChatSession extends BaseEntity {
+  public class ChatSession extends BaseEntity {
 
     @Column(name = "session_no", nullable = false, unique = true, length = 32)
     private String sessionNo;

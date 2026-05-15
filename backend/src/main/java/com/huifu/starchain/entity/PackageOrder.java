@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "package_orders")
-@Getter @NoArgsConstructor public class PackageOrder extends BaseEntity {
+  public class PackageOrder extends BaseEntity {
 
     @Column(name = "order_no", nullable = false, unique = true, length = 32)
     private String orderNo;

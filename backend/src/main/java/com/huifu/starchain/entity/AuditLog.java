@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "audit_logs")
-@Getter @NoArgsConstructor public class AuditLog extends BaseEntity {
+  public class AuditLog extends BaseEntity {
 
     @Column(name = "trace_id", length = 64)
     private String traceId;

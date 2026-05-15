@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-@Getter @NoArgsConstructor public class User extends BaseEntity {
+  public class User extends BaseEntity {
 
     @Column(name = "openid", unique = true)
     private String openid;

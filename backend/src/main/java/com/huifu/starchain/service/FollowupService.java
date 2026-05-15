@@ -5,7 +5,7 @@ import com.huifu.starchain.common.exception.BusinessException;
 import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.entity.FollowupTask;
 import com.huifu.starchain.repository.FollowupTaskRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+
 public class FollowupService {
 
     private final FollowupTaskRepository taskRepo;

@@ -4,7 +4,7 @@ import com.huifu.starchain.common.response.ApiResponse;
 import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.entity.*;
 import com.huifu.starchain.service.*;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +12,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@RequiredArgsConstructor
+
 public class UserController {
 
     private final UserService userService;
+
+    public UserController(UserService userService, UserService userService) { this.userService = userService; this.userService = userService; }
 
     @GetMapping("/me")
     public ApiResponse<User> me(@AuthenticationPrincipal Long userId) {
@@ -44,7 +46,7 @@ public class UserController {
 
 @RestController
 @RequestMapping("/api/v1/families")
-@RequiredArgsConstructor
+
 class FamilyController {
 
     private final UserService userService;

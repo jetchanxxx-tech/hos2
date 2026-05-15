@@ -5,7 +5,7 @@ import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.entity.*;
 import com.huifu.starchain.repository.*;
 import com.huifu.starchain.service.*;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +13,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@RequiredArgsConstructor
+
 public class AdminController {
 
     private final UserRepository userRepo;
     private final ServicePackageService pkgService;
     private final AuditLogRepository auditLogRepo;
     private final HospitalGatewaySyncRepository syncRepo;
+
+    public AdminController(UserRepository userRepo, ServicePackageService pkgService, AuditLogRepository auditLogRepo, HospitalGatewaySyncRepository syncRepo) { this.userRepo = userRepo; this.pkgService = pkgService; this.auditLogRepo = auditLogRepo; this.syncRepo = syncRepo; }
 
     // ---- Users ----
     @GetMapping("/users")

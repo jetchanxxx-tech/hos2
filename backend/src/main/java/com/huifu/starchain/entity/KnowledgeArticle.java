@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "knowledge_articles")
-@Getter @NoArgsConstructor public class KnowledgeArticle extends BaseEntity {
+  public class KnowledgeArticle extends BaseEntity {
 
     @Column(name = "title", nullable = false, length = 256)
     private String title;

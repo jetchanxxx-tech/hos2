@@ -4,7 +4,7 @@ import com.huifu.starchain.common.response.ApiResponse;
 import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.entity.FollowupTask;
 import com.huifu.starchain.service.FollowupService;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/followups")
-@RequiredArgsConstructor
+
 public class FollowupController {
 
     private final FollowupService followupService;

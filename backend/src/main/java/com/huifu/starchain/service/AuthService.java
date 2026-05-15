@@ -7,8 +7,8 @@ import com.huifu.starchain.config.jwt.JwtUtil;
 import com.huifu.starchain.dto.auth.*;
 import com.huifu.starchain.entity.User;
 import com.huifu.starchain.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +18,17 @@ import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
 
-@Slf4j
+
 @Service
-@RequiredArgsConstructor
+
 public class AuthService {
 
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final CryptoUtil cryptoUtil;
+
+    public AuthService(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, CryptoUtil cryptoUtil) { this.userRepo = userRepo; this.passwordEncoder = passwordEncoder; this.jwtUtil = jwtUtil; this.cryptoUtil = cryptoUtil; }
 
     @Transactional
     public LoginResponse register(RegisterRequest req) {

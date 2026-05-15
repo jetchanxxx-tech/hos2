@@ -5,13 +5,13 @@ import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.entity.PackageOrder;
 import com.huifu.starchain.entity.ServicePackage;
 import com.huifu.starchain.service.ServicePackageService;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/packages")
-@RequiredArgsConstructor
+
 public class ServicePackageController {
 
     private final ServicePackageService pkgService;

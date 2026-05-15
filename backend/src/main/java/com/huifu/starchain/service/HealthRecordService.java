@@ -5,7 +5,7 @@ import com.huifu.starchain.entity.HealthRecord;
 import com.huifu.starchain.entity.LabReport;
 import com.huifu.starchain.repository.HealthRecordRepository;
 import com.huifu.starchain.repository.LabReportRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
+
 public class HealthRecordService {
 
     private final HealthRecordRepository recordRepo;
     private final LabReportRepository labRepo;
+
+    public HealthRecordService(HealthRecordRepository recordRepo, LabReportRepository labRepo) { this.recordRepo = recordRepo; this.labRepo = labRepo; }
 
     public PageResult<HealthRecord> getTimeline(Long userId, int page, int size, String recordType) {
         var pg = (recordType == null || recordType.isBlank())

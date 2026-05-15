@@ -5,7 +5,7 @@ import com.huifu.starchain.common.exception.BusinessException;
 import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.entity.*;
 import com.huifu.starchain.repository.*;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +16,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
-@RequiredArgsConstructor
+
 public class ServicePackageService {
 
     private final ServicePackageRepository pkgRepo;
     private final PackageOrderRepository orderRepo;
     private final BenefitRedemptionRepository redemptionRepo;
+
+    public ServicePackageService(ServicePackageRepository pkgRepo, PackageOrderRepository orderRepo, BenefitRedemptionRepository redemptionRepo) { this.pkgRepo = pkgRepo; this.orderRepo = orderRepo; this.redemptionRepo = redemptionRepo; }
 
     // ---- Service Packages ----
     public PageResult<ServicePackage> listPackages(int page, int size) {

@@ -5,7 +5,7 @@ import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.entity.HealthRecord;
 import com.huifu.starchain.entity.LabReport;
 import com.huifu.starchain.service.HealthRecordService;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/records")
-@RequiredArgsConstructor
+
 public class HealthRecordController {
 
     private final HealthRecordService recordService;

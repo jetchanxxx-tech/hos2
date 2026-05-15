@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "dashboard_cache")
-@Getter @NoArgsConstructor public class DashboardCache extends BaseEntity {
+  public class DashboardCache extends BaseEntity {
 
     @Column(name = "metric_name", nullable = false, length = 64)
     private String metricName;

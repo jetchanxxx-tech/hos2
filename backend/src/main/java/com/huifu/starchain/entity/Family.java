@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "families")
-@Getter @NoArgsConstructor public class Family extends BaseEntity {
+  public class Family extends BaseEntity {
 
     @Column(name = "family_name", nullable = false, length = 128)
     private String familyName;

@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "service_packages")
-@Getter @NoArgsConstructor public class ServicePackage extends BaseEntity {
+  public class ServicePackage extends BaseEntity {
 
     @Column(name = "name", nullable = false, length = 128)
     private String name;

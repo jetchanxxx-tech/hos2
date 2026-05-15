@@ -7,7 +7,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "health_records")
-@Getter @NoArgsConstructor public class HealthRecord extends BaseEntity {
+  public class HealthRecord extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;

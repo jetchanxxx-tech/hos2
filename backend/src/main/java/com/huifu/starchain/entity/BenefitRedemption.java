@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "benefit_redemptions")
-@Getter @NoArgsConstructor public class BenefitRedemption extends BaseEntity {
+  public class BenefitRedemption extends BaseEntity {
 
     @Column(name = "order_id", nullable = false)
     private Long orderId;

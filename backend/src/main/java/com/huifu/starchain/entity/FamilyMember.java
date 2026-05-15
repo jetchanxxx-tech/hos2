@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "family_members", uniqueConstraints = @UniqueConstraint(columnNames = {"familyId", "userId"}))
-@Getter @NoArgsConstructor public class FamilyMember extends BaseEntity {
+  public class FamilyMember extends BaseEntity {
 
     @Column(name = "family_id", nullable = false)
     private Long familyId;

@@ -6,7 +6,7 @@ import com.huifu.starchain.common.response.PageResult;
 import com.huifu.starchain.config.CryptoConfig.CryptoUtil;
 import com.huifu.starchain.entity.*;
 import com.huifu.starchain.repository.*;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+
 public class UserService {
 
     private final UserRepository userRepo;
     private final FamilyRepository familyRepo;
     private final FamilyMemberRepository familyMemberRepo;
     private final CryptoUtil cryptoUtil;
+
+    public UserService(UserRepository userRepo, FamilyRepository familyRepo, FamilyMemberRepository familyMemberRepo, CryptoUtil cryptoUtil) { this.userRepo = userRepo; this.familyRepo = familyRepo; this.familyMemberRepo = familyMemberRepo; this.cryptoUtil = cryptoUtil; }
 
     public User getUserById(Long id) {
         return userRepo.findById(id)
@@ -84,12 +86,11 @@ public class UserService {
         if (familyMemberRepo.findByFamilyIdAndUserId(familyId, memberUserId).isPresent()) {
             throw new BusinessException(409, "该成员已在家庭中");
         }
-        FamilyMember fm = FamilyMember.builder()
-                .familyId(familyId)
-                .userId(memberUserId)
-                .relationship(FamilyMember.Relationship.valueOf(relationship))
-                .shareScope(shareScope)
-                .build();
+        FamilyMember fm = new FamilyMember();
+        fm.setFamilyId(familyId);
+        fm.setUserId(memberUserId);
+        fm.setRelationship(FamilyMember.Relationship.valueOf(relationship));
+        fm.setShareScope(shareScope);
         fm = familyMemberRepo.save(fm);
         member.setFamilyId(familyId);
         userRepo.save(member);

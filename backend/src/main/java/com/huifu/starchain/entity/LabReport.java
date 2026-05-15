@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "lab_reports")
-@Getter @NoArgsConstructor public class LabReport extends BaseEntity {
+  public class LabReport extends BaseEntity {
 
     @Column(name = "health_record_id", nullable = false)
     private Long healthRecordId;

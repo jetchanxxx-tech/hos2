@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "hospital_gateway_sync")
-@Getter @NoArgsConstructor public class HospitalGatewaySync extends BaseEntity {
+  public class HospitalGatewaySync extends BaseEntity {
 
     @Column(name = "data_type", nullable = false, length = 16)
     private String dataType;
