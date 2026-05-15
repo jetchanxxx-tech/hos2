@@ -106,9 +106,12 @@ public class AuthService {
                 .build();
     }
 
-    private String sha256(String input) {
-        return HexFormat.of().formatHex(
-                java.security.MessageDigest.getInstance("SHA-256")
-                        .digest(input.getBytes(StandardCharsets.UTF_8)));
+    private static String sha256(String input) {
+        try {
+            var md = java.security.MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(md.digest(input.getBytes(StandardCharsets.UTF_8)));
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
