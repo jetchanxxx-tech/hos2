@@ -34,7 +34,7 @@
 | 数据主权 | 完整医疗数据留院（HIS/EMR），云端仅存脱敏摘要 |
 | 家庭维度 | family_id 贯穿全部业务表，一位成员关联即全家庭可见（需授权） |
 | 事件溯源 | 审计日志覆盖所有写操作，trace_id 关联分布式追踪 |
-| 弹性伸缩 | Docker Compose 水平扩展，Redis 缓存读多写少场景 |
+| 弹性伸缩 | Systemd 服务管理，Redis 缓存读多写少场景 |
 
 ---
 
@@ -190,7 +190,7 @@ users (1) ──< family_members >── (1) families
 | 前端框架 | Vue 3 + TypeScript | 3.4 |
 | 构建工具 | Vite | 5.x |
 | UI 设计系统 | 自定义 oklch 令牌 | - |
-| 容器化 | Docker + Docker Compose | - |
+| 部署 | Systemd 原生服务 + Nginx 反向代理 | - |
 | 反向代理 | Nginx | 1.25 |
 
 ---
