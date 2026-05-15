@@ -4,9 +4,11 @@ import com.huifu.starchain.entity.DashboardCache;
 import com.huifu.starchain.entity.User;
 import com.huifu.starchain.repository.*;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -19,8 +21,22 @@ public class DashboardService {
     private final UserRepository userRepo;
     private final PackageOrderRepository orderRepo;
     private final FollowupTaskRepository followupRepo;
+    private final ChatSessionRepository chatSessionRepo;
+    private final AuditLogRepository auditLogRepo;
+    private final ServicePackageRepository pkgRepo;
 
-    public DashboardService(DashboardCacheRepository cacheRepo, UserRepository userRepo, PackageOrderRepository orderRepo, FollowupTaskRepository followupRepo) { this.cacheRepo = cacheRepo; this.userRepo = userRepo; this.orderRepo = orderRepo; this.followupRepo = followupRepo; }
+    public DashboardService(DashboardCacheRepository cacheRepo, UserRepository userRepo,
+            PackageOrderRepository orderRepo, FollowupTaskRepository followupRepo,
+            ChatSessionRepository chatSessionRepo, AuditLogRepository auditLogRepo,
+            ServicePackageRepository pkgRepo) {
+        this.cacheRepo = cacheRepo;
+        this.userRepo = userRepo;
+        this.orderRepo = orderRepo;
+        this.followupRepo = followupRepo;
+        this.chatSessionRepo = chatSessionRepo;
+        this.auditLogRepo = auditLogRepo;
+        this.pkgRepo = pkgRepo;
+    }
 
     public Map<String, Object> getKpiSummary() {
         LocalDate monthStart = LocalDate.now().withDayOfMonth(1);
@@ -32,14 +48,19 @@ public class DashboardService {
         kpis.put("familiesCount", userRepo.countWithFamily());
         kpis.put("monthlyRevenue", orderRepo.sumRevenueSince(since));
         kpis.put("followupCompleted", followupRepo.countCompletedSince(since));
-        kpis.put("satisfactionScore", BigDecimal.valueOf(4.82));
 
-        // Calculate follow-up rate
+        // 真实满意度
+        Double avgSat = chatSessionRepo.avgSatisfaction();
+        kpis.put("satisfactionScore", BigDecimal.valueOf(avgSat != null ? avgSat : 0).setScale(2, RoundingMode.HALF_UP));
+
+        // 随访完成率
         long scheduled = followupRepo.countScheduledBetween(monthStart, LocalDate.now());
         long completed = followupRepo.countCompletedSince(since);
         double rate = scheduled > 0 ? (double) completed / scheduled * 100 : 0;
         kpis.put("followupRate", Math.round(rate * 10) / 10.0);
 
+        // 订单数量
+        kpis.put("packageOrderCount", orderRepo.count());
         return kpis;
     }
 
@@ -48,9 +69,16 @@ public class DashboardService {
         List<Map<String, Object>> result = new ArrayList<>();
         for (Object[] row : rows) {
             Map<String, Object> entry = new LinkedHashMap<>();
-            entry.put("packageId", row[0]);
+            Long packageId = (Long) row[0];
+            entry.put("packageId", packageId);
             entry.put("count", row[1]);
             entry.put("revenue", row[2]);
+            // 回填服务包名称和价格
+            pkgRepo.findById(packageId).ifPresent(pkg -> {
+                entry.put("packageName", pkg.getName());
+                entry.put("price", pkg.getPrice());
+                entry.put("status", pkg.getStatus().name());
+            });
             result.add(entry);
         }
         return result;
@@ -62,28 +90,65 @@ public class DashboardService {
     }
 
     public List<Map<String, Object>> getRecentActivity() {
-        // In production: query from a unified activity stream
-        // For MVP, return mock activity feed
         List<Map<String, Object>> activities = new ArrayList<>();
-        activities.add(Map.of("type", "followup", "actor", "李医生", "action", "完成产后42天随访",
-                "target", "张*芳", "time", "2 分钟前"));
-        activities.add(Map.of("type", "redemption", "actor", "王莉", "action", "核销 VIP 陪诊服务",
-                "target", "陈*婷", "time", "8 分钟前"));
-        activities.add(Map.of("type", "system", "actor", "系统", "action", "自动同步 14 份检验报告",
-                "target", "惠福时光轴", "time", "15 分钟前"));
-        activities.add(Map.of("type", "task", "actor", "刘护士", "action", "创建疫苗提醒任务",
-                "target", "王*娟", "time", "32 分钟前"));
-        activities.add(Map.of("type", "alert", "actor", "惠福灵犀", "action", "触发紧急预警",
-                "target", "关键词\"出血\"", "time", "48 分钟前"));
+        var logs = auditLogRepo.findRecent(PageRequest.of(0, 20));
+        for (var log : logs.getContent()) {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("action", log.getAction());
+            entry.put("resourceType", log.getResourceType());
+            entry.put("time", log.getCreatedAt() != null ? log.getCreatedAt().toString() : "");
+            entry.put("result", log.getResult());
+            entry.put("userId", log.getUserId());
+            activities.add(entry);
+        }
         return activities;
     }
 
     public Map<String, Object> getButlerLeaderboard() {
         Map<String, Object> board = new LinkedHashMap<>();
-        board.put("topButlers", List.of(
-                Map.of("name", "陈*华", "points", 1250, "rank", 1),
-                Map.of("name", "刘*霞", "points", 980, "rank", 2),
-                Map.of("name", "黄*强", "points", 870, "rank", 3)));
+        List<Object[]> rows = followupRepo.butlerCompletionRanking();
+        List<Map<String, Object>> topButlers = new ArrayList<>();
+        int rank = 0;
+        for (Object[] row : rows) {
+            if (rank >= 10) break;
+            rank++;
+            Long butlerId = (Long) row[0];
+            Long count = (Long) row[1];
+            String name = "管家#" + butlerId;
+            try {
+                var u = userRepo.findById(butlerId);
+                if (u.isPresent()) name = u.get().getNameMasked();
+            } catch (Exception ignored) {}
+            topButlers.add(Map.of("name", name, "followupCount", count, "points", count * 5, "rank", rank));
+        }
+        board.put("topButlers", topButlers);
         return board;
+    }
+
+    /** 满意度分布（1-5 分各数量） */
+    public List<Map<String, Object>> getSatisfactionDistribution() {
+        List<Object[]> rows = chatSessionRepo.satisfactionDistribution();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Object[] row : rows) {
+            result.add(Map.of("score", row[0], "count", row[1]));
+        }
+        return result;
+    }
+
+    /** 随访按管家分组的完成率 */
+    public List<Map<String, Object>> getFollowupByButler() {
+        List<Object[]> rows = followupRepo.butlerCompletionRanking();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Object[] row : rows) {
+            Long butlerId = (Long) row[0];
+            Long completed = (Long) row[1];
+            String name = "管家#" + butlerId;
+            try {
+                var u = userRepo.findById(butlerId);
+                if (u.isPresent()) name = u.get().getNameMasked();
+            } catch (Exception ignored) {}
+            result.add(Map.of("butlerName", name, "completedTasks", completed));
+        }
+        return result;
     }
 }

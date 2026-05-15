@@ -20,8 +20,9 @@ public class AdminController {
     private final ServicePackageService pkgService;
     private final AuditLogRepository auditLogRepo;
     private final HospitalGatewaySyncRepository syncRepo;
+    private final KnowledgeArticleRepository knowledgeRepo;
 
-    public AdminController(UserRepository userRepo, ServicePackageService pkgService, AuditLogRepository auditLogRepo, HospitalGatewaySyncRepository syncRepo) { this.userRepo = userRepo; this.pkgService = pkgService; this.auditLogRepo = auditLogRepo; this.syncRepo = syncRepo; }
+    public AdminController(UserRepository userRepo, ServicePackageService pkgService, AuditLogRepository auditLogRepo, HospitalGatewaySyncRepository syncRepo, KnowledgeArticleRepository knowledgeRepo) { this.userRepo = userRepo; this.pkgService = pkgService; this.auditLogRepo = auditLogRepo; this.syncRepo = syncRepo; this.knowledgeRepo = knowledgeRepo; }
 
     // ---- Users ----
     @GetMapping("/users")
@@ -89,6 +90,33 @@ public class AdminController {
     @GetMapping("/sync-status/pending")
     public ApiResponse<?> pendingSync() {
         return ApiResponse.ok(syncRepo.findBySyncStatusOrderByCreatedAtAsc("PENDING"));
+    }
+
+    // ---- Knowledge Base ----
+    @GetMapping("/knowledge")
+    public ApiResponse<PageResult<KnowledgeArticle>> listKnowledge(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        var pg = knowledgeRepo.findAll(PageRequest.of(page - 1, size));
+        return ApiResponse.ok(PageResult.of(pg.getContent(), pg.getTotalElements(), page, size));
+    }
+
+    @PostMapping("/knowledge")
+    public ApiResponse<KnowledgeArticle> createKnowledge(@RequestBody KnowledgeArticle article) {
+        article.setStatus("PUBLISHED");
+        return ApiResponse.ok(knowledgeRepo.save(article));
+    }
+
+    @PutMapping("/knowledge/{id}")
+    public ApiResponse<KnowledgeArticle> updateKnowledge(@PathVariable Long id, @RequestBody KnowledgeArticle article) {
+        var existing = knowledgeRepo.findById(id).orElse(null);
+        if (existing == null) return ApiResponse.error(40400, "知识文章不存在");
+        existing.setQuestion(article.getQuestion());
+        existing.setAnswer(article.getAnswer());
+        existing.setCategory(article.getCategory());
+        existing.setTags(article.getTags());
+        existing.setStatus(article.getStatus());
+        return ApiResponse.ok(knowledgeRepo.save(existing));
     }
 
     // ---- Stats ----

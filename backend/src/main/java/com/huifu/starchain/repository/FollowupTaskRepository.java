@@ -26,4 +26,7 @@ public interface FollowupTaskRepository extends JpaRepository<FollowupTask, Long
 
     @Query("SELECT ft.status, COUNT(ft) FROM FollowupTask ft GROUP BY ft.status")
     List<Object[]> countByStatus();
+
+    @Query("SELECT ft.assignedButlerId, COUNT(ft) FROM FollowupTask ft WHERE ft.assignedButlerId IS NOT NULL AND ft.status = 'COMPLETED' GROUP BY ft.assignedButlerId ORDER BY COUNT(ft) DESC")
+    List<Object[]> butlerCompletionRanking();
 }

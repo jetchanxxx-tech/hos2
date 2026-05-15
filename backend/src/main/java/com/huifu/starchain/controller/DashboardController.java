@@ -48,4 +48,14 @@ public class DashboardController {
     public ApiResponse<Map<String, Object>> butlerLeaderboard() {
         return ApiResponse.ok(dashboardService.getButlerLeaderboard());
     }
+
+    @GetMapping("/satisfaction-distribution")
+    public ApiResponse<List<Map<String, Object>>> satisfactionDistribution() {
+        return ApiResponse.ok(dashboardService.getSatisfactionDistribution());
+    }
+
+    @GetMapping("/followup-by-butler")
+    public ApiResponse<List<Map<String, Object>>> followupByButler() {
+        return ApiResponse.ok(dashboardService.getFollowupByButler());
+    }
 }

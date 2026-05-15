@@ -63,4 +63,14 @@ import java.time.LocalDateTime;
     public void setCreatedBy(Long createdBy) { this.createdBy = createdBy; }
     public LocalDateTime getPublishedAt() { return publishedAt; }
     public void setPublishedAt(LocalDateTime publishedAt) { this.publishedAt = publishedAt; }
+    public String getAnswerType() { return answerType; }
+    public void setAnswerType(String answerType) { this.answerType = answerType; }
+    public Integer getViewCount() { return viewCount; }
+    public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+    public Integer getHelpfulCount() { return helpfulCount; }
+    public void setHelpfulCount(Integer helpfulCount) { this.helpfulCount = helpfulCount; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getTags() { return tagsJson; }
+    public void setTags(String tags) { this.tagsJson = tags; }
 }

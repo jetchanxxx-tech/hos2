@@ -94,4 +94,6 @@ import java.time.LocalDateTime;
     public void setDurationMs(Integer durationMs) { this.durationMs = durationMs; }
     public String getErrorMsg() { return errorMsg; }
     public void setErrorMsg(String errorMsg) { this.errorMsg = errorMsg; }
+    public String getResult() { return result; }
+    public void setResult(String result) { this.result = result; }
 }

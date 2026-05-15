@@ -53,6 +53,12 @@ const router = createRouter({
       component: () => import('@/pages/system/PackageManager.vue'),
       meta: { title: '服务包管理' },
     },
+    {
+      path: '/system/admin',
+      name: 'AdminDashboard',
+      component: () => import('@/pages/system/AdminDashboard.vue'),
+      meta: { title: '系统管理后台' },
+    },
   ],
 })
 

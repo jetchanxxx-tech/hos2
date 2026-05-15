@@ -104,10 +104,14 @@ export const followupApi = {
 
 // ---- Admin ----
 export const adminApi = {
-  listUsers: (page = 1, size = 20, role?: string) => api.get('/admin/users', { params: { page, size, role } }),
+  listUsers: (page = 1, size = 20, role?: string, keyword?: string) =>
+    api.get('/admin/users', { params: { page, size, role, keyword } }),
   updateUserStatus: (id: number, status: string) => api.put(`/admin/users/${id}/status`, null, { params: { status } }),
   updateUserRole: (id: number, role: string) => api.put(`/admin/users/${id}/role`, null, { params: { role } }),
   auditLogs: (page = 1, size = 50, userId?: number) =>
     api.get('/admin/audit-logs', { params: { page, size, userId } }),
   stats: () => api.get('/admin/stats'),
+  listKnowledge: (page = 1, size = 20) => api.get('/admin/knowledge', { params: { page, size } }),
+  createKnowledge: (data: any) => api.post('/admin/knowledge', data),
+  updateKnowledge: (id: number, data: any) => api.put(`/admin/knowledge/${id}`, data),
 }

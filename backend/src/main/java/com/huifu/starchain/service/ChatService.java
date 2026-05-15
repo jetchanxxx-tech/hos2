@@ -60,6 +60,11 @@ public class ChatService {
             session.setStatus("WAITING_BUTLER");
             sessionRepo.save(session);
         }
+        // 意图识别与情绪检测
+        if (content != null) {
+            session.setIntentType(detectIntent(content));
+            session.setSentimentLabel(detectSentiment(content));
+        }
         return msgRepo.save(msg);
     }
 
@@ -141,5 +146,28 @@ public class ChatService {
         for (String kw : new String[]{"出血","剧痛","破水","晕倒","抽搐","呼吸困难","大出血"})
             if (text.contains(kw)) return kw;
         return null;
+    }
+
+    /** 意图识别（基于关键词规则，P2 升级为 LLM） */
+    public String detectIntent(String text) {
+        String t = text.toLowerCase();
+        if (containsKeyword(t, "痛","疼","出血","发烧","咳嗽","吐","晕","药","检查","复查","手术","指标","病","诊")) return "MEDICAL";
+        if (containsKeyword(t, "券","核销","预约","陪诊","套餐","退","服务包","钱","退费","权益")) return "BENEFIT";
+        if (containsKeyword(t, "投诉","差","火大","等太久","态度","敷衍","退款","举报")) return "COMPLAINT";
+        if (containsKeyword(t, "挂号","下次","时间","约","改期","什么时候")) return "APPOINTMENT";
+        return "GENERAL";
+    }
+
+    /** 情绪检测（基于关键词规则，P2 升级为 LLM） */
+    public String detectSentiment(String text) {
+        if (containsKeyword(text, "投诉","火大","差劲","烂","退款","举报","敷衍","气死","操","cnm")) return "ANGRY";
+        if (containsKeyword(text, "担心","怕","焦虑","紧张","严重","危险","怎么办","会不会")) return "ANXIOUS";
+        if (containsKeyword(text, "谢谢","感谢","好","棒","满意","开心","太好了")) return "POSITIVE";
+        return "NEUTRAL";
+    }
+
+    private boolean containsKeyword(String text, String... keywords) {
+        for (String kw : keywords) if (text.contains(kw)) return true;
+        return false;
     }
 }
