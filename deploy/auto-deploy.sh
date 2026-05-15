@@ -241,7 +241,7 @@ deploy_api() {
         info "检测到预编译 jar，构建 Docker 镜像..."
         cd /opt/huifu-starchain
         docker build -f backend/Dockerfile.slim -t huifu-starchain-api:latest . 2>&1 | tail -5
-        docker compose -f deploy/docker-compose.yml up -d api 2>&1
+        docker compose -f deploy/docker-compose.yml --profile full up -d api 2>&1
         log "API 服务已启动"
     elif command -v java &>/dev/null; then
         # 方式 B: 直接 java -jar 运行
@@ -251,7 +251,7 @@ deploy_api() {
             mvn clean package -DskipTests -q 2>&1 | tail -10
             cd /opt/huifu-starchain
             docker build -f backend/Dockerfile.slim -t huifu-starchain-api:latest . 2>&1 | tail -5
-            docker compose -f deploy/docker-compose.yml up -d api 2>&1
+            docker compose -f deploy/docker-compose.yml --profile full up -d api 2>&1
             log "API 编译并启动完成"
         fi
     else

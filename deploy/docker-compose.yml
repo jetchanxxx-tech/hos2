@@ -1,8 +1,5 @@
-version: '3.8'
-
 # ============================================================
 # 惠福星链 · Huifu StarChain — Docker Compose
-# 生产环境部署配置
 # ============================================================
 
 services:
@@ -23,8 +20,6 @@ services:
       - frontend-dist:/usr/share/nginx/html:ro
     networks:
       - huifu-net
-    depends_on:
-      - api
     logging:
       driver: "json-file"
       options:
