@@ -32,15 +32,17 @@ services:
         max-file: "5"
 
   # ---------------------------------------------------------
-  # Spring Boot API
+  # Spring Boot API (需先 mvn package 编译出 jar)
   # ---------------------------------------------------------
   api:
     build:
       context: ../backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.slim
     image: huifu-starchain-api:${APP_VERSION:-latest}
     container_name: huifu-api
     restart: unless-stopped
+    profiles:
+      - full
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SERVER_PORT=8080

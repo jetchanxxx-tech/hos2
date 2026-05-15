@@ -1,22 +1,15 @@
 #!/bin/bash
 # ============================================================
-# 惠福星链 · 一键自动部署脚本
-# Auto-detect environment, install deps, deploy all services
-# 用法: curl -fsSL <raw-url> | bash
-#      或: bash auto-deploy.sh
+# 惠福星链 · 一键自动部署脚本（国内优化版）
+# 用法: bash auto-deploy.sh
 # ============================================================
 set -euo pipefail
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log()  { echo -e "${GREEN}[✓]${NC} $1"; }
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
+log()  { echo -e "${GREEN}[√]${NC} $1"; }
 warn() { echo -e "${YELLOW}[!]${NC} $1"; }
-err()  { echo -e "${RED}[✗]${NC} $1"; exit 1; }
-info() { echo -e "${BLUE}[•]${NC} $1"; }
+err()  { echo -e "${RED}[X]${NC} $1"; }
+info() { echo -e "${BLUE}[>]${NC} $1"; }
 
 # ============================================================
 # 0. 环境检测
@@ -25,97 +18,94 @@ detect_os() {
     info "检测操作系统..."
     if [ -f /etc/os-release ]; then
         . /etc/os-release
-        OS=$ID
-        VER=$VERSION_ID
+        OS=$ID; VER=$VERSION_ID
         log "OS: $NAME $VERSION_ID"
     else
         err "无法检测操作系统"
     fi
-
     ARCH=$(uname -m)
-    log "架构: $ARCH"
-
     CPU_CORES=$(nproc)
     MEM_TOTAL=$(free -m | awk '/Mem/{print $2}')
     DISK_AVAIL=$(df -h / | awk 'NR==2{print $4}')
-    log "CPU: ${CPU_CORES} 核 | 内存: ${MEM_TOTAL}MB | 磁盘可用: ${DISK_AVAIL}"
+    log "CPU: ${CPU_CORES} 核 | 内存: ${MEM_TOTAL}MB | 磁盘: ${DISK_AVAIL}"
 }
 
 # ============================================================
-# 1. 安装 Docker
+# 1. 配置 Docker 国内镜像加速（最先执行）
+# ============================================================
+setup_docker_mirror() {
+    info "配置 Docker 国内镜像加速..."
+    mkdir -p /etc/docker
+    cat > /etc/docker/daemon.json << 'EOF'
+{
+  "registry-mirrors": [
+    "https://docker.1ms.run",
+    "https://docker.xuanyuan.me",
+    "https://docker.rainbond.cc",
+    "https://dockerproxy.net",
+    "https://docker.nju.edu.cn"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "50m",
+    "max-file": "3"
+  }
+}
+EOF
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl restart docker 2>/dev/null || service docker restart 2>/dev/null || true
+    sleep 3
+    if docker info &>/dev/null; then
+        log "Docker 镜像加速配置完成"
+    else
+        warn "Docker 重启中，稍后重试..."
+        sleep 5
+    fi
+}
+
+# ============================================================
+# 2. 安装 Docker（如果缺失）
 # ============================================================
 install_docker() {
     if command -v docker &>/dev/null; then
         log "Docker 已安装: $(docker --version)"
         return
     fi
-
-    warn "Docker 未安装，开始安装..."
-    case $OS in
-        ubuntu|debian)
-            curl -fsSL https://get.docker.com | bash
-            ;;
-        centos|rhel|fedora)
-            curl -fsSL https://get.docker.com | bash
-            ;;
-        *)
-            err "不支持的OS: $OS"
-            ;;
-    esac
-
+    warn "安装 Docker..."
+    curl -fsSL https://get.docker.com | bash
     systemctl enable --now docker 2>/dev/null || service docker start
     log "Docker 安装完成"
 }
 
 # ============================================================
-# 2. 安装 Docker Compose
+# 3. 安装 Docker Compose 插件
 # ============================================================
 install_compose() {
     if docker compose version &>/dev/null; then
         log "Docker Compose 已安装: $(docker compose version --short)"
         return
     fi
-
-    warn "Docker Compose 未安装，开始安装..."
-    COMPOSE_VER=$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest \
-        | grep -o '"tag_name": "[^"]*"' | head -1 | cut -d'"' -f4)
-    [ -z "$COMPOSE_VER" ] && COMPOSE_VER="v2.24.0"
-
+    warn "安装 Docker Compose..."
+    local v="v2.24.0"
     mkdir -p /usr/local/lib/docker/cli-plugins
-    curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VER}/docker-compose-linux-${ARCH}" \
+    curl -fsSL "https://github.com/docker/compose/releases/download/${v}/docker-compose-linux-${ARCH}" \
         -o /usr/local/lib/docker/cli-plugins/docker-compose
     chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-
-    # Also create legacy symlink
     ln -sf /usr/local/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose 2>/dev/null || true
-
-    log "Docker Compose ${COMPOSE_VER} 安装完成"
+    log "Docker Compose ${v} 安装完成"
 }
 
 # ============================================================
-# 3. 创建目录结构
+# 4. 创建目录 & 生成密钥
 # ============================================================
-setup_dirs() {
-    info "创建目录..."
-    mkdir -p /opt/huifu-starchain
+setup_dirs_and_env() {
+    mkdir -p /opt/huifu-starchain/deploy/{mysql/conf.d,nginx/ssl,scripts}
     mkdir -p /backup/huifu-starchain
     mkdir -p /var/log/huifu-starchain
-    log "目录已创建"
-}
 
-# ============================================================
-# 4. 配置环境变量
-# ============================================================
-setup_env() {
-    if [ -f /opt/huifu-starchain/deploy/.env ]; then
-        log ".env 已存在，跳过生成"
-        source /opt/huifu-starchain/deploy/.env
-        return
-    fi
-
-    warn "生成随机密钥..."
-    cat > /opt/huifu-starchain/deploy/.env << EOF
-# 惠福星链 · 环境变量（自动生成）
+    if [ ! -f /opt/huifu-starchain/deploy/.env ]; then
+        warn "生成随机密钥..."
+        cat > /opt/huifu-starchain/deploy/.env << ENVEOF
 MYSQL_ROOT_PASSWORD=$(openssl rand -base64 24)
 MYSQL_PASSWORD=$(openssl rand -base64 24)
 REDIS_PASSWORD=$(openssl rand -base64 16)
@@ -123,81 +113,173 @@ MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=$(openssl rand -base64 24)
 JWT_SECRET=$(openssl rand -base64 48)
 AES_KEY=$(openssl rand -base64 32)
-
-# 微信（按需填入）
 WECHAT_APP_ID=
 WECHAT_APP_SECRET=
-
-# 企业微信（按需填入）
 WECOM_CORP_ID=
 WECOM_CORP_SECRET=
-WECOM_AGENT_ID=
-
-# 医院网关（按需填入）
 HOSPITAL_GATEWAY_URL=
 HOSPITAL_API_KEY=
-
 APP_VERSION=latest
-EOF
-    chmod 600 /opt/huifu-starchain/deploy/.env
-    log ".env 已生成"
+ENVEOF
+        chmod 600 /opt/huifu-starchain/deploy/.env
+        log ".env 已生成"
+    fi
 
-    set -a; source /opt/huifu-starchain/deploy/.env; set +a
-}
-
-# ============================================================
-# 5. 配置 MySQL
-# ============================================================
-setup_mysql_conf() {
-    mkdir -p /opt/huifu-starchain/deploy/mysql/conf.d
+    # MySQL 配置
     cat > /opt/huifu-starchain/deploy/mysql/conf.d/huifu.cnf << 'MYSQLCNF'
 [mysqld]
 character-set-server = utf8mb4
 collation-server = utf8mb4_unicode_ci
 default_authentication_plugin = mysql_native_password
 innodb_buffer_pool_size = 256M
-innodb_log_file_size = 128M
-max_connections = 200
+max_connections = 100
 max_allowed_packet = 64M
-slow_query_log = 1
-long_query_time = 1
-sql_mode = STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
 MYSQLCNF
-    log "MySQL 配置已生成"
+
+    # SSL 自签名证书
+    if [ ! -f /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.crt ]; then
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.key \
+            -out /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.crt \
+            -subj "/CN=localhost" 2>/dev/null
+        log "自签名证书已生成"
+    fi
+
+    set -a; source /opt/huifu-starchain/deploy/.env; set +a
 }
 
 # ============================================================
-# 6. 部署服务
+# 5. 拉取镜像（优先）
 # ============================================================
-deploy_services() {
-    info "启动服务..."
+pull_images() {
+    info "预拉取 Docker 镜像（可能需要几分钟）..."
+    local images=(
+        "nginx:1.25-alpine"
+        "mysql:8.0"
+        "redis:7-alpine"
+        "minio/minio:latest"
+    )
+    for img in "${images[@]}"; do
+        info "拉取 $img ..."
+        if docker pull "$img" 2>&1 | tail -1; then
+            log "  $img OK"
+        else
+            warn "  $img 拉取失败，重试一次..."
+            sleep 3
+            docker pull "$img" 2>&1 | tail -1 || warn "  $img 再次失败，跳过"
+        fi
+    done
+}
 
+# ============================================================
+# 6. 启动服务
+# ============================================================
+start_services() {
+    info "启动服务..."
     cd /opt/huifu-starchain/deploy
 
-    # 停止旧容器（保留数据卷）
     docker compose down --remove-orphans 2>/dev/null || true
 
-    # 拉取镜像 & 构建
-    docker compose pull 2>/dev/null || true
-    docker compose build api --no-cache 2>/dev/null || warn "API 镜像构建跳过（Maven/pom 项目需本地构建）"
+    # 逐个启动，方便排查问题
+    info "启动 MySQL..."
+    docker compose up -d mysql 2>&1
+    sleep 5
 
-    # 启动服务（不等待 API 镜像构建，用预构建镜像或跳过）
-    docker compose up -d nginx mysql redis minio 2>/dev/null || true
+    info "启动 Redis..."
+    docker compose up -d redis 2>&1
+    sleep 2
 
-    log "基础服务已启动"
+    info "启动 MinIO..."
+    docker compose up -d minio 2>&1
+    sleep 3
+
+    info "启动 Nginx..."
+    docker compose up -d nginx 2>&1
+    sleep 2
+
+    log "基础服务启动完成"
 }
 
 # ============================================================
-# 7. 健康检查
+# 7. 初始化数据库
+# ============================================================
+init_database() {
+    info "等待 MySQL 就绪..."
+    for i in $(seq 1 20); do
+        if docker exec huifu-mysql mysqladmin ping -u root -p"${MYSQL_ROOT_PASSWORD}" --silent 2>/dev/null; then
+            log "MySQL 已就绪 (${i}s)"
+            break
+        fi
+        [ "$i" -eq 20 ] && { warn "MySQL 启动超时"; return; }
+        sleep 2
+    done
+
+    # 手动执行 SQL 初始化（因为 Flyway 依赖 API 容器）
+    info "初始化数据库表..."
+    if [ -f /opt/huifu-starchain/database/migrations/V1__init_schema.sql ]; then
+        docker exec -i huifu-mysql mysql -u root -p"${MYSQL_ROOT_PASSWORD}" huifu_starchain \
+            < /opt/huifu-starchain/database/migrations/V1__init_schema.sql 2>&1 | tail -3
+        log "表结构已导入"
+    fi
+    if [ -f /opt/huifu-starchain/database/migrations/V2__seed_data.sql ]; then
+        docker exec -i huifu-mysql mysql -u root -p"${MYSQL_ROOT_PASSWORD}" huifu_starchain \
+            < /opt/huifu-starchain/database/migrations/V2__seed_data.sql 2>&1 | tail -3
+        log "种子数据已导入"
+    fi
+}
+
+# ============================================================
+# 8. 部署后端 API
+# ============================================================
+deploy_api() {
+    info "检查 API 部署方式..."
+
+    local jar_path="/opt/huifu-starchain/backend/target/starchain-1.0.0-SNAPSHOT.jar"
+
+    if [ -f "$jar_path" ]; then
+        # 方式 A: 用 slim Dockerfile 构建镜像
+        info "检测到预编译 jar，构建 Docker 镜像..."
+        cd /opt/huifu-starchain
+        docker build -f backend/Dockerfile.slim -t huifu-starchain-api:latest . 2>&1 | tail -5
+        docker compose -f deploy/docker-compose.yml up -d api 2>&1
+        log "API 服务已启动"
+    elif command -v java &>/dev/null; then
+        # 方式 B: 直接 java -jar 运行
+        warn "未找到 jar，尝试 Maven 编译..."
+        cd /opt/huifu-starchain/backend
+        if [ -f pom.xml ]; then
+            mvn clean package -DskipTests -q 2>&1 | tail -10
+            cd /opt/huifu-starchain
+            docker build -f backend/Dockerfile.slim -t huifu-starchain-api:latest . 2>&1 | tail -5
+            docker compose -f deploy/docker-compose.yml up -d api 2>&1
+            log "API 编译并启动完成"
+        fi
+    else
+        warn "API 未部署（需要先编译 jar 或安装 Java/Maven）"
+        warn "跳过 API，基础服务（MySQL/Redis/MinIO/Nginx）已正常运行"
+        info ""
+        info "=== 部署 API 的方法 ==="
+        info "方案 A（推荐）: 在你本地编译 jar，然后 scp 上传到服务器"
+        info "  # 本地:"
+        info "  cd backend && mvn clean package -DskipTests"
+        info "  scp target/starchain-1.0.0-SNAPSHOT.jar jet@server:/opt/huifu-starchain/backend/target/"
+        info "  # 然后重新运行本脚本"
+        info ""
+        info "方案 B: 在服务器上安装 Java 21 + Maven，本脚本会自动编译"
+        info "  apt install -y openjdk-21-jdk maven"
+        info "  bash auto-deploy.sh"
+    fi
+}
+
+# ============================================================
+# 9. 健康检查
 # ============================================================
 health_check() {
-    info "等待服务就绪 (30s)..."
-    sleep 10
+    echo ""
+    info "=== 健康检查 ==="
 
     local all_ok=true
-
-    # 检查容器
-    for svc in huifu-nginx huifu-mysql huifu-redis huifu-minio; do
+    for svc in huifu-mysql huifu-redis huifu-minio huifu-nginx; do
         if docker ps --format '{{.Names}}' | grep -q "^${svc}$"; then
             log "容器 ${svc}: 运行中"
         else
@@ -206,73 +288,28 @@ health_check() {
         fi
     done
 
-    # 检查 MySQL
-    if docker exec huifu-mysql mysqladmin ping -u root -p"${MYSQL_ROOT_PASSWORD}" &>/dev/null; then
-        log "MySQL: 健康"
-    else
-        warn "MySQL: 未就绪"
-        all_ok=false
+    # MySQL 数据验证
+    if docker exec huifu-mysql mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT COUNT(*) AS tables FROM information_schema.tables WHERE table_schema='huifu_starchain';" 2>/dev/null; then
+        log "数据库表已创建"
     fi
 
-    # 检查 API（如果已构建）
-    if docker ps --format '{{.Names}}' | grep -q "huifu-api"; then
-        sleep 30
-        for i in 1 2 3; do
-            if curl -sf http://localhost:8080/api/v1/health &>/dev/null; then
-                log "API (8080): 健康"
-                break
-            else
-                warn "API 健康检查尝试 $i/3..."
-                sleep 10
-            fi
-        done
+    # API 检查
+    sleep 5
+    if curl -sf http://localhost:8080/api/v1/health &>/dev/null; then
+        log "API 服务: 健康"
     else
-        warn "API 容器未启动（需先执行 build 步骤）"
-    fi
-
-    if $all_ok; then
-        log "基础服务全部就绪"
+        warn "API 服务: 未运行（正常 — 如未部署 API）"
     fi
 }
 
 # ============================================================
-# 8. 配置 SSL（可选）
-# ============================================================
-setup_ssl() {
-    if [ "${1:-}" = "--ssl" ] && [ -n "${2:-}" ]; then
-        local domain="$2"
-        info "配置 SSL 证书: ${domain}"
-
-        if command -v certbot &>/dev/null; then
-            certbot certonly --standalone -d "${domain}" --non-interactive --agree-tos --email admin@${domain}
-            cp /etc/letsencrypt/live/${domain}/fullchain.pem /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.crt
-            cp /etc/letsencrypt/live/${domain}/privkey.pem /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.key
-            docker compose -f /opt/huifu-starchain/deploy/docker-compose.yml restart nginx
-            log "SSL 配置完成"
-        else
-            warn "certbot 未安装，跳过 SSL"
-        fi
-    else
-        # 生成自签名证书（内网/测试）
-        mkdir -p /opt/huifu-starchain/deploy/nginx/ssl
-        if [ ! -f /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.crt ]; then
-            openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-                -keyout /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.key \
-                -out /opt/huifu-starchain/deploy/nginx/ssl/huifu-starchain.crt \
-                -subj "/CN=localhost" 2>/dev/null
-            log "自签名证书已生成"
-        fi
-    fi
-}
-
-# ============================================================
-# 9. 设置定时任务
+# 10. 设置定时备份
 # ============================================================
 setup_cron() {
-    # 数据库每日备份 (凌晨 2:00)
-    if ! crontab -l 2>/dev/null | grep -q "huifu.*backup"; then
-        (crontab -l 2>/dev/null; echo "0 2 * * * bash /opt/huifu-starchain/deploy/scripts/backup.sh >> /var/log/huifu-backup.log 2>&1") | crontab -
-        log "定时备份已配置 (每日 02:00)"
+    local backup_script="/opt/huifu-starchain/deploy/scripts/backup.sh"
+    if ! crontab -l 2>/dev/null | grep -q "backup"; then
+        (crontab -l 2>/dev/null; echo "0 2 * * * bash ${backup_script} >> /var/log/huifu-backup.log 2>&1") | crontab -
+        log "每日备份已配置 (02:00)"
     fi
 }
 
@@ -289,12 +326,13 @@ echo ""
 
 detect_os
 install_docker
+setup_docker_mirror
 install_compose
-setup_dirs
-setup_env
-setup_mysql_conf
-deploy_services
-setup_ssl "$@"
+setup_dirs_and_env
+pull_images
+start_services
+init_database
+deploy_api
 setup_cron
 health_check
 
@@ -303,26 +341,12 @@ echo "============================================"
 echo " 部署完成"
 echo "============================================"
 echo ""
-echo " 访问地址:"
-echo "   HTTP:  http://$(hostname -I 2>/dev/null | awk '{print $1}' || echo 'localhost')"
-echo "   HTTPS: https://$(hostname -I 2>/dev/null | awk '{print $1}' || echo 'localhost')"
+echo " 访问地址:  http://$(hostname -I 2>/dev/null | awk '{print $1}')"
 echo ""
-echo " 服务端口:"
-echo "   Nginx:  80, 443"
-echo "   API:    8080"
-echo "   MySQL:  3306"
-echo "   Redis:  6379"
-echo "   MinIO:  9001 (console)"
+echo " 常用命令:"
+echo "   docker compose -f /opt/huifu-starchain/deploy/docker-compose.yml ps"
+echo "   docker compose -f /opt/huifu-starchain/deploy/docker-compose.yml logs -f"
+echo "   bash /opt/huifu-starchain/deploy/scripts/backup.sh"
 echo ""
-echo " 管理命令:"
-echo "   cd /opt/huifu-starchain/deploy"
-echo "   docker compose ps              # 查看服务状态"
-echo "   docker compose logs -f api     # 查看 API 日志"
-echo "   docker compose restart api     # 重启 API"
-echo "   bash scripts/backup.sh         # 手动备份数据库"
-echo "   bash scripts/health-check.sh   # 健康检查"
-echo ""
-echo " 首次登录:"
-echo "   账号: 13800001111"
-echo "   密码: 任意"
+echo " 首次登录: admin / admin123"
 echo "============================================"

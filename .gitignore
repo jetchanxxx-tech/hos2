@@ -36,3 +36,4 @@ ssh_test.py
 *.sql.gz
 nul
 ssh_test.py
+*.zip
