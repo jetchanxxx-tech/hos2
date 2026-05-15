@@ -24,8 +24,6 @@ public class JwtUtil {
     private final long refreshExpiration;
     private final String issuer;
 
-    public JwtUtil(SecretKey key, long accessExpiration, long refreshExpiration, String issuer) { this.key = key; this.accessExpiration = accessExpiration; this.refreshExpiration = refreshExpiration; this.issuer = issuer; }
-
     public JwtUtil(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-expiration}") long accessExpiration,
