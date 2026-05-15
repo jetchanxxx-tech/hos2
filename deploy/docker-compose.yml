@@ -78,11 +78,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2G
-          cpus: '2'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
+          memory: 1G
+          cpus: '1'
 
   # ---------------------------------------------------------
   # MySQL 8.0 Community Edition
@@ -100,8 +97,6 @@ services:
       - mysql-data:/var/lib/mysql
       - ./mysql/conf.d:/etc/mysql/conf.d:ro
       - ../database/migrations:/docker-entrypoint-initdb.d:ro
-    ports:
-      - "3306:3306"
     networks:
       - huifu-net
     healthcheck:
@@ -133,8 +128,6 @@ services:
       --save 60 10000
     volumes:
       - redis-data:/data
-    ports:
-      - "6379:6379"
     networks:
       - huifu-net
     healthcheck:
