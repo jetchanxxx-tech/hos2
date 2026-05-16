@@ -87,7 +87,9 @@
 ### 4.2 V2.0 新增
 - `ImAdapter` 接口 + `InternalChatAdapter`（内置聊天）+ `WechatImAdapter`（预留微信对接）
 - ChatService.sendMessage 自动写入 intentType/sentimentLabel
+- **IM 回调接口**（V2.0）：POST /api/v1/chat/callback/{channel} → 接收微信/QQ/飞书推送消息
 - V3 演示数据：2 段完整客服对话（包含 AI 秒回 + 管家人工回复）
+- 管理后台新增"客服会话"Tab：查看所有会话（意图/状态/升级级别）
 
 ### 4.3 IM 对接架构
 ```
@@ -114,7 +116,9 @@ InternalChatAdapter（内置） / WechatImAdapter（预留） / FeishuImAdapter�
 
 ### 5.2 V2.0 新增
 - DashboardService 去 Mock 化：满意度从 ChatSession 真实聚合、积分从随访统计数据
-- 新增端点：satisfaction-distribution / followup-by-butler
+- 新增端点：satisfaction-distribution / followup-by-butler / conversion-funnel / revenue-trend
+- 转化漏斗：注册→绑家庭→购买→转化率（真实 DB 查询）
+- 营收趋势：近 12 个月逐月收入对比
 - AuditLog → 活动流格式化（actor / action / target / time）
 - 新增 Dashboard KPI：packageOrderCount
 
