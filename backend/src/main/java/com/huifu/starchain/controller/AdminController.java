@@ -22,7 +22,9 @@ public class AdminController {
     private final HospitalGatewaySyncRepository syncRepo;
     private final KnowledgeArticleRepository knowledgeRepo;
 
-    public AdminController(UserRepository userRepo, ServicePackageService pkgService, AuditLogRepository auditLogRepo, HospitalGatewaySyncRepository syncRepo, KnowledgeArticleRepository knowledgeRepo, ChatSessionRepository chatSessionRepo, PackageOrderRepository orderRepo) { this.userRepo = userRepo; this.pkgService = pkgService; this.auditLogRepo = auditLogRepo; this.syncRepo = syncRepo; this.knowledgeRepo = knowledgeRepo; this.chatSessionRepo = chatSessionRepo; this.orderRepo = orderRepo; }
+    public AdminController(UserRepository userRepo, ServicePackageService pkgService, AuditLogRepository auditLogRepo, HospitalGatewaySyncRepository syncRepo, KnowledgeArticleRepository knowledgeRepo, ChatSessionRepository chatSessionRepo, PackageOrderRepository orderRepo, ComplaintService complaintService) { this.userRepo = userRepo; this.pkgService = pkgService; this.auditLogRepo = auditLogRepo; this.syncRepo = syncRepo; this.knowledgeRepo = knowledgeRepo; this.chatSessionRepo = chatSessionRepo; this.orderRepo = orderRepo; this.complaintService = complaintService; }
+
+    private final ComplaintService complaintService;
 
     private final ChatSessionRepository chatSessionRepo;
     private final PackageOrderRepository orderRepo;
@@ -138,6 +140,29 @@ public class AdminController {
         existing.setTags(article.getTags());
         existing.setStatus(article.getStatus());
         return ApiResponse.ok(knowledgeRepo.save(existing));
+    }
+
+    // ---- Complaints ----
+    @GetMapping("/complaints")
+    public ApiResponse<PageResult<Complaint>> listComplaints(
+            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String status) {
+        return ApiResponse.ok(complaintService.listByStatus(status, page, size));
+    }
+
+    @PostMapping("/complaints")
+    public ApiResponse<Complaint> createComplaint(@RequestBody Complaint complaint) {
+        return ApiResponse.ok(complaintService.create(complaint));
+    }
+
+    @PutMapping("/complaints/{id}/assign")
+    public ApiResponse<Complaint> assignComplaint(@PathVariable Long id, @RequestParam Long butlerId) {
+        return ApiResponse.ok(complaintService.assign(id, butlerId));
+    }
+
+    @PutMapping("/complaints/{id}/resolve")
+    public ApiResponse<Complaint> resolveComplaint(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        return ApiResponse.ok(complaintService.resolve(id, body.get("resolution"), null));
     }
 
     // ---- Stats ----
