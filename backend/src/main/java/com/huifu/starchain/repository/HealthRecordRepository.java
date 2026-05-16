@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface HealthRecordRepository extends JpaRepository<HealthRecord, Long>, JpaSpecificationExecutor<HealthRecord> {
@@ -23,4 +24,6 @@ public interface HealthRecordRepository extends JpaRepository<HealthRecord, Long
 
     @Query("SELECT hr.source, COUNT(hr) FROM HealthRecord hr WHERE hr.createdAt >= :since AND hr.isDeleted = false GROUP BY hr.source")
     List<Object[]> countBySourceSince(LocalDateTime since);
+
+    Optional<HealthRecord> findTopByUserIdAndRecordTypeInOrderByEventDateDesc(Long userId, List<String> recordTypes);
 }

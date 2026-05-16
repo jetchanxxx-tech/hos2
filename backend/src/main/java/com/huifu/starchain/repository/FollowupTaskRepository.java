@@ -29,4 +29,7 @@ public interface FollowupTaskRepository extends JpaRepository<FollowupTask, Long
 
     @Query("SELECT ft.assignedButlerId, COUNT(ft) FROM FollowupTask ft WHERE ft.assignedButlerId IS NOT NULL AND ft.status = 'COMPLETED' GROUP BY ft.assignedButlerId ORDER BY COUNT(ft) DESC")
     List<Object[]> butlerCompletionRanking();
+
+    List<FollowupTask> findByTriggerCondition(String triggerCondition);
+    List<FollowupTask> findByTaskTypeAndUserId(String taskType, Long userId);
 }

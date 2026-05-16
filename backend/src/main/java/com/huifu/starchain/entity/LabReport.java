@@ -67,6 +67,8 @@ import java.time.LocalDate;
     public void setReportDate(LocalDate reportDate) { this.reportDate = reportDate; }
     public String getMachineInfo() { return machineInfo; }
     public void setMachineInfo(String machineInfo) { this.machineInfo = machineInfo; }
+    public Integer getIsAbnormal() { return isAbnormal; }
+    public void setIsAbnormal(Integer isAbnormal) { this.isAbnormal = isAbnormal; }
     public String getTrendDataJson() { return trendDataJson; }
     public void setTrendDataJson(String trendDataJson) { this.trendDataJson = trendDataJson; }
 }
