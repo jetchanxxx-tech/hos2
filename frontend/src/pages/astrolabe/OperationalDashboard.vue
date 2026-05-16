@@ -17,18 +17,25 @@ const salesColumns = [
   { key: 'status', label: '状态' },
 ]
 
+const funnel = ref<any>({})
+const revenueTrend = ref<any[]>([])
+
 onMounted(async () => {
   try {
-    const [k, s, a, l] = await Promise.all([
+    const [k, s, a, l, f, r] = await Promise.all([
       dashboardApi.kpiSummary(),
       dashboardApi.salesRanking(),
       dashboardApi.activityFeed(),
       dashboardApi.butlerLeaderboard(),
+      dashboardApi.conversionFunnel(),
+      dashboardApi.revenueTrend(),
     ])
     kpis.value = (k as any).data || k
     salesRanking.value = (s as any).data || s || []
     activities.value = (a as any).data || a || []
     leaderboard.value = (l as any).data || l || {}
+    funnel.value = (f as any).data || {}
+    revenueTrend.value = (r as any).data || []
   } catch (e) { console.error(e) }
 })
 </script>
@@ -82,6 +89,29 @@ onMounted(async () => {
       </div>
     </div>
 
+    <!-- 转化漏斗 + 营收趋势 -->
+    <div class="two-col" style="margin-top:var(--space-6)">
+      <div class="card">
+        <div class="card-title">📊 转化漏斗</div>
+        <div class="funnel">
+          <div class="funnel-step"><span class="label">注册用户</span><span class="val">{{ funnel.registeredUsers||0 }}</span><div class="bar bar1"></div></div>
+          <div class="funnel-step"><span class="label">绑定家庭</span><span class="val">{{ funnel.boundFamily||0 }}</span><div class="bar bar2"></div></div>
+          <div class="funnel-step"><span class="label">购买服务包</span><span class="val">{{ funnel.purchasedPackage||0 }}</span><div class="bar bar3"></div></div>
+          <div class="funnel-step"><span class="label">转化率</span><span class="val">{{ funnel.conversionRate||0 }}%</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💵 营收趋势</div>
+        <div class="revenue-bars">
+          <div v-for="m in revenueTrend" :key="m.month" class="rev-row">
+            <span class="rev-label">{{ m.month }}</span>
+            <span class="rev-val">¥{{ (m.revenue/10000).toFixed(1) }}万</span>
+          </div>
+          <div v-if="revenueTrend.length===0" class="hint">暂无营收数据</div>
+        </div>
+      </div>
+    </div>
+
     <div class="card" style="margin-top:var(--space-6)">
       <div class="card-title">🏆 医护积分榜</div>
       <div class="butler-grid">
@@ -120,5 +150,16 @@ onMounted(async () => {
 .butler-item { padding: var(--space-3) var(--space-4); background: var(--surface-alt); border-radius: var(--radius-sm); display: flex; align-items: center; gap: var(--space-3); }
 .butler-rank { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
 .butler-pts { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-muted); }
+.funnel { display: flex; flex-direction: column; gap: var(--space-2); }
+.funnel-step { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) 0; }
+.funnel-step .label { width: 90px; font-size: var(--text-xs); color: var(--fg-secondary); }
+.funnel-step .val { font-weight: 600; font-size: var(--text-sm); min-width: 60px; }
+.funnel-step .bar { height: 8px; border-radius: 4px; background: var(--accent); }
+.bar1 { width: 100%; } .bar2 { width: 65%; } .bar3 { width: 30%; }
+.revenue-bars { display: flex; flex-direction: column; gap: var(--space-1); }
+.rev-row { display: flex; justify-content: space-between; padding: var(--space-1) 0; border-bottom: 1px solid var(--border-light); font-size: var(--text-sm); }
+.rev-label { color: var(--fg-muted); }
+.rev-val { font-weight: 600; color: var(--accent); }
+.hint { font-size: var(--text-xs); color: var(--fg-muted); text-align: center; padding: var(--space-4); }
 @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } .page { padding: var(--space-4); } }
 </style>

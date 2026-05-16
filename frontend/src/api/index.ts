@@ -85,6 +85,8 @@ export const dashboardApi = {
   butlerLeaderboard: () => api.get('/dashboard/butler-leaderboard'),
   metricHistory: (name: string, from?: string, to?: string) =>
     api.get(`/dashboard/metrics/${name}/history`, { params: { from, to } }),
+  conversionFunnel: () => api.get('/dashboard/conversion-funnel'),
+  revenueTrend: () => api.get('/dashboard/revenue-trend'),
 }
 
 // ---- Chat ----

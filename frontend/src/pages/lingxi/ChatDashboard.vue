@@ -48,7 +48,17 @@ function scrollToBottom() {
   if (el) el.scrollTop = el.scrollHeight
 }
 
-const intentLabels: Record<string, string> = { MEDICAL: '医疗咨询', BENEFIT: '权益问题', COMPLAINT: '投诉', GENERAL: '通用' }
+const intentLabels: Record<string, string> = { MEDICAL: '医疗咨询', BENEFIT: '权益问题', COMPLAINT: '投诉', APPOINTMENT: '预约', GENERAL: '通用' }
+const sentimentLabels: Record<string, string> = { POSITIVE: '😊 积极', NEUTRAL: '😐 中性', ANXIOUS: '😰 焦虑', ANGRY: '😡 愤怒' }
+
+async function startNewSession() {
+  try {
+    const res: any = await chatApi.startSession('MINIPROGRAM')
+    const s = res.data
+    sessions.value.unshift(s)
+    if (s.id) selectSession(s.id)
+  } catch(e) { console.error(e) }
+}
 </script>
 
 <template>
@@ -61,17 +71,25 @@ const intentLabels: Record<string, string> = { MEDICAL: '医疗咨询', BENEFIT:
 
     <div class="chat-layout">
       <div class="session-list">
-        <h3>会话列表</h3>
+        <div class="session-list-header">
+          <h3>会话列表</h3>
+          <button class="btn-new-session" @click="startNewSession">+ 新建</button>
+        </div>
         <div v-for="s in sessions" :key="s.id" class="session-item"
-          :class="{ active: activeSession === s.id }" @click="selectSession(s.id)">
-          <div class="session-name">用户 {{ s.userId }}</div>
+          :class="{ active: activeSession === s.id, urgent: s.escalationLevel === 'URGENT' }" @click="selectSession(s.id)">
+          <div class="session-name">
+            {{ s.sessionNo?.substring(s.sessionNo.length-6) || '#'+s.id }}
+            <span class="chan-tag">{{ s.channel }}</span>
+          </div>
           <div class="session-meta">
+            <span v-if="s.intentType" class="tag">{{ intentLabels[s.intentType] || s.intentType }}</span>
+            <span v-if="s.sentimentLabel" class="tag sentiment">{{ sentimentLabels[s.sentimentLabel] || s.sentimentLabel }}</span>
             <StatusPill :status="s.escalationLevel === 'URGENT' ? 'blocked' : s.status === 'ACTIVE' ? 'active' : 'completed'">
-              {{ s.escalationLevel === 'URGENT' ? '⚠ 紧急' : intentLabels[s.intentType] || s.status }}
+              {{ s.escalationLevel === 'URGENT' ? '⚠' : s.status === 'ACTIVE' ? '●' : '✓' }}
             </StatusPill>
           </div>
         </div>
-        <div v-if="sessions.length === 0" class="empty">暂无会话</div>
+        <div v-if="sessions.length === 0" class="empty">暂无会话，点击"+ 新建"创建</div>
       </div>
 
       <div class="chat-main">
@@ -102,11 +120,18 @@ const intentLabels: Record<string, string> = { MEDICAL: '医疗咨询', BENEFIT:
 .section-desc { font-size: var(--text-md); color: var(--fg-secondary); margin-top: var(--space-2); }
 .chat-layout { display: grid; grid-template-columns: 280px 1fr; gap: var(--space-6); height: calc(100vh - 200px); min-height: 500px; }
 .session-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); overflow-y: auto; }
-.session-list h3 { font-size: var(--text-sm); font-weight: 600; margin-bottom: var(--space-3); color: var(--fg); }
+.session-list { display: flex; flex-direction: column; }
+.session-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); }
+.session-list-header h3 { font-size: var(--text-sm); font-weight: 600; color: var(--fg); }
+.btn-new-session { padding: 2px 10px; background: var(--accent); color: #fff; border: none; border-radius: 100px; font-size: var(--text-xs); cursor: pointer; }
 .session-item { padding: var(--space-3); border-radius: var(--radius-sm); cursor: pointer; border-bottom: 1px solid var(--border-light); }
 .session-item:hover, .session-item.active { background: var(--accent-bg); }
-.session-name { font-weight: 500; font-size: var(--text-sm); }
-.session-meta { margin-top: var(--space-1); }
+.session-item.urgent { background: var(--danger-bg); border-left: 3px solid var(--danger); }
+.session-name { font-weight: 500; font-size: var(--text-sm); display: flex; align-items: center; gap: var(--space-2); }
+.chan-tag { font-size: 9px; background: var(--surface-alt); color: var(--fg-muted); padding: 1px 4px; border-radius: 3px; }
+.session-meta { margin-top: var(--space-1); display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.tag { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--info-bg); color: var(--info); }
+.tag.sentiment { background: var(--accent-bg); color: var(--accent); }
 .chat-main { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
 .chat-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--fg-muted); }
 .msg-list { flex: 1; overflow-y: auto; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
