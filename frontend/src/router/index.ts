@@ -36,6 +36,12 @@ const router = createRouter({
       meta: { title: '随访管理' },
     },
     {
+      path: '/profile',
+      name: 'ProfileEdit',
+      component: () => import('@/pages/ProfileEdit.vue'),
+      meta: { title: '个人资料' },
+    },
+    {
       path: '/concentric',
       name: 'FamilyOverview',
       component: () => import('@/pages/concentric/FamilyOverview.vue'),

@@ -54,7 +54,9 @@ export const userApi = {
   toggleEmergency: (familyId: number, memberUserId: number) =>
     api.put(`/families/${familyId}/members/${memberUserId}/emergency`),
   dissolveFamily: (id: number) => api.delete(`/families/${id}`),
+  joinFamily: (inviteCode: string) => api.post('/families/join', null, { params: { inviteCode } }),
   searchUsers: (keyword: string) => api.get('/users', { params: { keyword, size: 10 } }),
+  updateProfile: (data: any) => api.put('/users/me/profile', data),
 }
 
 // ---- Health Records ----

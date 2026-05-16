@@ -29,6 +29,30 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(BizError.USER_NOT_FOUND));
     }
 
+    @Transactional
+    public User updateProfile(Long userId, User updated) {
+        User user = getUserById(userId);
+        if (updated.getBirthDate() != null) user.setBirthDate(updated.getBirthDate());
+        if (updated.getGender() != null) user.setGender(updated.getGender());
+        if (updated.getAvatarUrl() != null) user.setAvatarUrl(updated.getAvatarUrl());
+        if (updated.getNameMasked() != null && !updated.getNameMasked().isBlank()) {
+            user.setNameMasked(updated.getNameMasked());
+            user.setRealName(cryptoUtil.encrypt(updated.getNameMasked()));
+        }
+        return userRepo.save(user);
+    }
+
+    @Transactional
+    public FamilyMember joinByInviteCode(String inviteCode, Long userId) {
+        Family family = familyRepo.findByInviteCode(inviteCode)
+                .orElseThrow(() -> new BusinessException(40403, "邀请码无效，未找到对应家庭"));
+        User user = getUserById(userId);
+        if (user.getFamilyId() != null) {
+            throw new BusinessException(409, "你已有所属家庭，请先退出后再加入新家庭");
+        }
+        return addFamilyMember(family.getId(), userId, "OTHER", "BASIC_ONLY");
+    }
+
     public PageResult<User> listResidents(int page, int size) {
         var pg = userRepo.findByRole(User.UserRole.RESIDENT, PageRequest.of(page - 1, size));
         return PageResult.of(pg.getContent(), pg.getTotalElements(), page, size);

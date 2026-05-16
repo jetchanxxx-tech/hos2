@@ -7,6 +7,9 @@ const members = ref<any[]>([])
 const loading = ref(true)
 const showInviteModal = ref(false)
 const showAddMemberModal = ref(false)
+const showJoinModal = ref(false)
+const joinInviteCode = ref('')
+const joinError = ref('')
 const searchKeyword = ref('')
 const searchResults = ref<any[]>([])
 const selectedRelationship = ref('OTHER')
@@ -79,6 +82,16 @@ async function handleToggleEmergency(memberUserId: number) {
     await userApi.toggleEmergency(family.value.id, memberUserId)
     await loadFamily()
   } catch (e: any) { errorMsg.value = e?.message || '操作失败' }
+}
+
+async function handleJoinFamily() {
+  joinError.value = ''
+  try {
+    await userApi.joinFamily(joinInviteCode.value.trim())
+    showJoinModal.value = false
+    joinInviteCode.value = ''
+    await loadFamily()
+  } catch (e: any) { joinError.value = e?.response?.data?.message || '加入失败，请检查邀请码' }
 }
 
 async function handleDissolveFamily() {
@@ -216,7 +229,24 @@ const shareScopeMap: Record<string, string> = {
     <!-- 空状态 -->
     <div v-else class="empty-card">
       <p>暂未创建家庭</p>
-      <button class="btn btn-primary" @click="handleCreateFamily">创建家庭</button>
+      <div class="empty-buttons">
+        <button class="btn btn-primary" @click="handleCreateFamily">创建家庭</button>
+        <button class="btn btn-outline" @click="showJoinModal = true">加入已有家庭</button>
+      </div>
+    </div>
+
+    <!-- 加入家庭弹窗 -->
+    <div v-if="showJoinModal" class="modal-overlay" @click.self="showJoinModal = false; joinError = ''">
+      <div class="modal">
+        <h3>加入已有家庭</h3>
+        <p class="hint">输入家庭邀请码（如 HF12345678）</p>
+        <input v-model="joinInviteCode" placeholder="邀请码" class="input full" style="font-size:var(--text-lg);text-align:center;letter-spacing:0.1em" maxlength="10" @keyup.enter="handleJoinFamily" />
+        <div v-if="joinError" class="error-banner">{{ joinError }}</div>
+        <div class="modal-buttons">
+          <button class="btn btn-primary" @click="handleJoinFamily">加入</button>
+          <button class="btn btn-secondary" @click="showJoinModal = false; joinError = ''; joinInviteCode = ''">取消</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -275,4 +305,8 @@ const shareScopeMap: Record<string, string> = {
 .btn-danger-text:disabled { color: var(--fg-muted); cursor: not-allowed; }
 .btn-link { background: none; border: none; color: var(--accent); cursor: pointer; font-size: var(--text-xs); padding: 0; }
 .btn-sm { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); }
+.empty-buttons { display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-4); }
+.modal-buttons { display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-4); }
+.input.full { width: 100%; box-sizing: border-box; }
+
 </style>

@@ -24,6 +24,11 @@ public class UserController {
         return ApiResponse.ok(userService.getUserById(userId));
     }
 
+    @PutMapping("/me/profile")
+    public ApiResponse<User> updateProfile(@AuthenticationPrincipal Long userId, @RequestBody User updated) {
+        return ApiResponse.ok(userService.updateProfile(userId, updated));
+    }
+
     @GetMapping
     public ApiResponse<PageResult<User>> listResidents(
             @RequestParam(defaultValue = "1") int page,
@@ -90,6 +95,13 @@ class FamilyController {
     public ApiResponse<Void> removeMember(@PathVariable Long id, @PathVariable Long memberUserId) {
         userService.removeFamilyMember(id, memberUserId);
         return ApiResponse.ok();
+    }
+
+    @PostMapping("/join")
+    public ApiResponse<FamilyMember> joinFamily(
+            @RequestParam String inviteCode,
+            @AuthenticationPrincipal Long userId) {
+        return ApiResponse.ok(userService.joinByInviteCode(inviteCode, userId));
     }
 
     @DeleteMapping("/{id}")
