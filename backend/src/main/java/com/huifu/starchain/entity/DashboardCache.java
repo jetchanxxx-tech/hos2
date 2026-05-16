@@ -61,6 +61,10 @@ import java.time.LocalDateTime;
     public void setDeltaPercent(BigDecimal deltaPercent) { this.deltaPercent = deltaPercent; }
     public String getMetaJson() { return metaJson; }
     public void setMetaJson(String metaJson) { this.metaJson = metaJson; }
+    public String getDimension() { return dimension; }
+    public void setDimension(String dimension) { this.dimension = dimension; }
+    public LocalDateTime getCalculatedAt() { return calculatedAt; }
+    public void setCalculatedAt(LocalDateTime calculatedAt) { this.calculatedAt = calculatedAt; }
 
     @Column(name = "calculated_at", nullable = false)
         private LocalDateTime calculatedAt = LocalDateTime.now();
