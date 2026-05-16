@@ -13,6 +13,7 @@ const navLinks = computed(() => {
     { path: '/timeline', label: '惠福时光轴' },
     { path: '/lingxi/chat', label: '惠福灵犀' },
     { path: '/concentric', label: '惠福同心圆' },
+    { path: '/packages', label: '服务包' },
   ]
   if (['HOSPITAL_ADMIN', 'OPS_ADMIN', 'SUPER_ADMIN'].includes(auth.role || '')) {
     links.push({ path: '/system/users', label: '系统管理' })

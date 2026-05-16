@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { adminApi, dashboardApi, pkgApi } from '@/api'
+import { adminApi, dashboardApi, pkgApi, complaintApi } from '@/api'
 import KpiCard from '@/components/KpiCard.vue'
 
 const stats = ref<any>({ totalUsers: 0, activeResidents: 0, butlers: 0 })
 const kpiSummary = ref<any>({})
 const leaderboard = ref<any[]>([])
 const auditLogs = ref<any[]>([])
-const tab = ref<'users'|'packages'|'knowledge'|'audit'|'sessions'|'orders'>('users')
+const tab = ref<'users'|'packages'|'knowledge'|'audit'|'sessions'|'orders'|'complaints'>('users')
 const users = ref<any[]>([])
 const packages = ref<any[]>([])
 const knowledge = ref<any[]>([])
 const sessions = ref<any[]>([])
 const orders = ref<any[]>([])
+const complaints = ref<any[]>([])
 
 onMounted(async () => {
-  const [s, k, l, a, u, p, kn, ss, od] = await Promise.all([
+  const [s, k, l, a, u, p, kn, ss, od, cp] = await Promise.all([
     adminApi.stats(),
     dashboardApi.kpiSummary(),
     dashboardApi.butlerLeaderboard(),
@@ -25,6 +26,7 @@ onMounted(async () => {
     adminApi.listKnowledge(1, 50),
     adminApi.listChatSessions(1, 50),
     adminApi.listOrders(1, 50),
+    complaintApi.list('PENDING', 1, 50),
   ])
   stats.value = (s as any).data || {}
   kpiSummary.value = (k as any).data || {}
@@ -35,6 +37,7 @@ onMounted(async () => {
   knowledge.value = ((kn as any).data?.content) || []
   sessions.value = ((ss as any).data?.content) || []
   orders.value = ((od as any).data?.content) || []
+  complaints.value = ((cp as any).data?.content) || []
 })
 
 async function handleRoleChange(userId: number, role: string) {
@@ -74,6 +77,7 @@ const roleOptions = ['RESIDENT','BUTLER_MEDICAL','BUTLER_SERVICE','HOSPITAL_ADMI
       <button :class="{active: tab==='audit'}" @click="tab='audit'">审计日志</button>
       <button :class="{active: tab==='sessions'}" @click="tab='sessions'">客服会话</button>
       <button :class="{active: tab==='orders'}" @click="tab='orders'">服务订单</button>
+      <button :class="{active: tab==='complaints'}" @click="tab='complaints'">投诉管理</button>
     </div>
 
     <!-- Users -->
@@ -131,6 +135,18 @@ const roleOptions = ['RESIDENT','BUTLER_MEDICAL','BUTLER_SERVICE','HOSPITAL_ADMI
       </tbody></table>
     </div>
 
+    <!-- Complaints -->
+    <div v-if="tab==='complaints'" class="table-wrap">
+      <table><thead><tr><th>ID</th><th>用户ID</th><th>分类</th><th>内容</th><th>状态</th><th>优先级</th><th>负责人</th></tr></thead><tbody>
+        <tr v-for="c in complaints" :key="c.id">
+          <td>{{ c.id }}</td><td>{{ c.userId }}</td><td>{{ c.category }}</td>
+          <td>{{ (c.content||'').substring(0,40) }}</td>
+          <td>{{ c.status }}</td><td>{{ c.priority }}</td><td>{{ c.assignedTo||'-' }}</td>
+        </tr>
+        <tr v-if="complaints.length===0"><td colspan="7" class="empty-hint">暂无投诉</td></tr>
+      </tbody></table>
+    </div>
+
     <!-- Butler Leaderboard -->
     <div class="section" style="margin-top: var(--space-8)">
       <h2>医护积分榜</h2>
@@ -158,4 +174,5 @@ select { padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px; 
 .table-wrap table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .table-wrap th { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: 2px solid var(--border); color: var(--fg-muted); font-weight: 600; white-space: nowrap; }
 .table-wrap td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
+.empty-hint { text-align: center; color: var(--fg-muted); padding: var(--space-4); }
 </style>
