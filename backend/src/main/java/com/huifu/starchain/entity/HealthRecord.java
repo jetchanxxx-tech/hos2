@@ -79,6 +79,14 @@ import java.time.LocalTime;
     public void setHospitalDept(String hospitalDept) { this.hospitalDept = hospitalDept; }
     public String getAttendingDoctor() { return attendingDoctor; }
     public void setAttendingDoctor(String attendingDoctor) { this.attendingDoctor = attendingDoctor; }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
+    public Boolean getAlertTriggered() { return alertTriggered; }
+    public void setAlertTriggered(Boolean alertTriggered) { this.alertTriggered = alertTriggered; }
+    public Boolean getIsDeleted() { return isDeleted; }
+    public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
+    public Integer getAbnormalFlag() { return abnormalFlag; }
+    public void setAbnormalFlag(Integer abnormalFlag) { this.abnormalFlag = abnormalFlag; }
     public String getTagsJson() { return tagsJson; }
     public void setTagsJson(String tagsJson) { this.tagsJson = tagsJson; }
 
