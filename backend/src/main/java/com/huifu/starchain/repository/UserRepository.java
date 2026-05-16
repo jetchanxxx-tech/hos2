@@ -28,4 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.familyId IS NOT NULL AND u.role = 'RESIDENT'")
     long countWithFamily();
+
+    @Query("SELECT u FROM User u WHERE u.phone LIKE %:keyword% OR u.nameMasked LIKE %:keyword%")
+    Page<User> searchByKeyword(String keyword, Pageable pageable);
 }

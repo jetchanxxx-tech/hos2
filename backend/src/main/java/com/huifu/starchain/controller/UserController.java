@@ -27,7 +27,11 @@ public class UserController {
     @GetMapping
     public ApiResponse<PageResult<User>> listResidents(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String keyword) {
+        if (keyword != null && !keyword.isBlank()) {
+            return ApiResponse.ok(userService.searchUsers(keyword, page, size));
+        }
         return ApiResponse.ok(userService.listResidents(page, size));
     }
 

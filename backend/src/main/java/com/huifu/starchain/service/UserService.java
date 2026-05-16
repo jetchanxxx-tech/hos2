@@ -41,6 +41,11 @@ public class UserService {
         return PageResult.of(pg.getContent(), pg.getTotalElements(), page, size);
     }
 
+    public PageResult<User> searchUsers(String keyword, int page, int size) {
+        var pg = userRepo.searchByKeyword(keyword, PageRequest.of(page - 1, size));
+        return PageResult.of(pg.getContent(), pg.getTotalElements(), page, size);
+    }
+
     // ---- Family ----
     public Family getFamilyByUserId(Long userId) {
         User user = getUserById(userId);
