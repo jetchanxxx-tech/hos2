@@ -22,7 +22,28 @@ public class AdminController {
     private final HospitalGatewaySyncRepository syncRepo;
     private final KnowledgeArticleRepository knowledgeRepo;
 
-    public AdminController(UserRepository userRepo, ServicePackageService pkgService, AuditLogRepository auditLogRepo, HospitalGatewaySyncRepository syncRepo, KnowledgeArticleRepository knowledgeRepo) { this.userRepo = userRepo; this.pkgService = pkgService; this.auditLogRepo = auditLogRepo; this.syncRepo = syncRepo; this.knowledgeRepo = knowledgeRepo; }
+    public AdminController(UserRepository userRepo, ServicePackageService pkgService, AuditLogRepository auditLogRepo, HospitalGatewaySyncRepository syncRepo, KnowledgeArticleRepository knowledgeRepo, ChatSessionRepository chatSessionRepo, PackageOrderRepository orderRepo) { this.userRepo = userRepo; this.pkgService = pkgService; this.auditLogRepo = auditLogRepo; this.syncRepo = syncRepo; this.knowledgeRepo = knowledgeRepo; this.chatSessionRepo = chatSessionRepo; this.orderRepo = orderRepo; }
+
+    private final ChatSessionRepository chatSessionRepo;
+    private final PackageOrderRepository orderRepo;
+
+    // ---- Chat Sessions ----
+    @GetMapping("/chat-sessions")
+    public ApiResponse<PageResult<ChatSession>> listChatSessions(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        var pg = chatSessionRepo.findAll(PageRequest.of(page - 1, size));
+        return ApiResponse.ok(PageResult.of(pg.getContent(), pg.getTotalElements(), page, size));
+    }
+
+    // ---- Orders ----
+    @GetMapping("/orders")
+    public ApiResponse<PageResult<PackageOrder>> listOrders(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        var pg = orderRepo.findAll(PageRequest.of(page - 1, size));
+        return ApiResponse.ok(PageResult.of(pg.getContent(), pg.getTotalElements(), page, size));
+    }
 
     // ---- Users ----
     @GetMapping("/users")

@@ -36,6 +36,9 @@ function isActive(path: string) {
         :class="{ active: isActive(link.path) }">
         {{ link.label }}
       </router-link>
+      <router-link v-if="auth.isLoggedIn" to="/profile" class="profile-link" :class="{ active: isActive('/profile') }" title="个人资料">
+        👤
+      </router-link>
       <button v-if="auth.isLoggedIn" class="btn btn-ghost btn-sm" @click="auth.logout(); router.push('/login')">
         退出
       </button>
@@ -76,6 +79,7 @@ function isActive(path: string) {
 .topnav-links a:hover, .topnav-links a.active {
   color: var(--fg); background: var(--surface-alt);
 }
+.profile-link { text-decoration: none; font-size: var(--text-lg); padding: var(--space-1) var(--space-2); }
 .btn { cursor: pointer; }
 .btn-ghost { background: transparent; color: var(--fg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); }
 .btn-sm { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); }
