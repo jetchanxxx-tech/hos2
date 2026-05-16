@@ -7,13 +7,15 @@ const stats = ref<any>({ totalUsers: 0, activeResidents: 0, butlers: 0 })
 const kpiSummary = ref<any>({})
 const leaderboard = ref<any[]>([])
 const auditLogs = ref<any[]>([])
-const tab = ref<'users'|'packages'|'knowledge'|'audit'>('users')
+const tab = ref<'users'|'packages'|'knowledge'|'audit'|'sessions'|'orders'>('users')
 const users = ref<any[]>([])
 const packages = ref<any[]>([])
 const knowledge = ref<any[]>([])
+const sessions = ref<any[]>([])
+const orders = ref<any[]>([])
 
 onMounted(async () => {
-  const [s, k, l, a, u, p, kn] = await Promise.all([
+  const [s, k, l, a, u, p, kn, ss, od] = await Promise.all([
     adminApi.stats(),
     dashboardApi.kpiSummary(),
     dashboardApi.butlerLeaderboard(),
@@ -21,6 +23,8 @@ onMounted(async () => {
     adminApi.listUsers(1, 50),
     pkgApi.list(1, 50),
     adminApi.listKnowledge(1, 50),
+    adminApi.listChatSessions(1, 50),
+    adminApi.listOrders(1, 50),
   ])
   stats.value = (s as any).data || {}
   kpiSummary.value = (k as any).data || {}
@@ -29,6 +33,8 @@ onMounted(async () => {
   users.value = ((u as any).data?.content) || []
   packages.value = ((p as any).data?.content) || []
   knowledge.value = ((kn as any).data?.content) || []
+  sessions.value = ((ss as any).data?.content) || []
+  orders.value = ((od as any).data?.content) || []
 })
 
 async function handleRoleChange(userId: number, role: string) {
@@ -66,6 +72,8 @@ const roleOptions = ['RESIDENT','BUTLER_MEDICAL','BUTLER_SERVICE','HOSPITAL_ADMI
       <button :class="{active: tab==='packages'}" @click="tab='packages'">服务包</button>
       <button :class="{active: tab==='knowledge'}" @click="tab='knowledge'">知识库</button>
       <button :class="{active: tab==='audit'}" @click="tab='audit'">审计日志</button>
+      <button :class="{active: tab==='sessions'}" @click="tab='sessions'">客服会话</button>
+      <button :class="{active: tab==='orders'}" @click="tab='orders'">服务订单</button>
     </div>
 
     <!-- Users -->
@@ -98,6 +106,28 @@ const roleOptions = ['RESIDENT','BUTLER_MEDICAL','BUTLER_SERVICE','HOSPITAL_ADMI
     <div v-if="tab==='audit'" class="table-wrap">
       <table><thead><tr><th>时间</th><th>用户ID</th><th>操作</th><th>资源</th><th>结果</th></tr></thead><tbody>
         <tr v-for="l in auditLogs" :key="l.id"><td>{{ l.createdAt }}</td><td>{{ l.userId }}</td><td>{{ l.action }}</td><td>{{ l.resourceType }}/{{ l.resourceId }}</td><td>{{ l.result }}</td></tr>
+      </tbody></table>
+    </div>
+
+    <!-- Chat Sessions -->
+    <div v-if="tab==='sessions'" class="table-wrap">
+      <table><thead><tr><th>ID</th><th>会话号</th><th>用户ID</th><th>渠道</th><th>意图</th><th>状态</th><th>升级</th><th>时间</th></tr></thead><tbody>
+        <tr v-for="s in sessions" :key="s.id">
+          <td>{{ s.id }}</td><td>{{ s.sessionNo }}</td><td>{{ s.userId }}</td><td>{{ s.channel }}</td>
+          <td>{{ s.intentType || '-' }}</td><td>{{ s.status }}</td><td>{{ s.escalationLevel }}</td>
+          <td>{{ s.createdAt?.substring(0,16) }}</td>
+        </tr>
+      </tbody></table>
+    </div>
+
+    <!-- Orders -->
+    <div v-if="tab==='orders'" class="table-wrap">
+      <table><thead><tr><th>ID</th><th>订单号</th><th>用户ID</th><th>服务包ID</th><th>金额</th><th>支付方式</th><th>状态</th><th>时间</th></tr></thead><tbody>
+        <tr v-for="o in orders" :key="o.id">
+          <td>{{ o.id }}</td><td>{{ o.orderNo }}</td><td>{{ o.userId }}</td><td>{{ o.packageId }}</td>
+          <td>¥{{ o.finalAmount || o.amount }}</td><td>{{ o.paymentMethod }}</td>
+          <td>{{ o.status }}</td><td>{{ o.createdAt?.substring(0,16) }}</td>
+        </tr>
       </tbody></table>
     </div>
 

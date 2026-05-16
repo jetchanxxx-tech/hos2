@@ -116,4 +116,6 @@ export const adminApi = {
   listKnowledge: (page = 1, size = 20) => api.get('/admin/knowledge', { params: { page, size } }),
   createKnowledge: (data: any) => api.post('/admin/knowledge', data),
   updateKnowledge: (id: number, data: any) => api.put(`/admin/knowledge/${id}`, data),
+  listChatSessions: (page = 1, size = 20) => api.get('/admin/chat-sessions', { params: { page, size } }),
+  listOrders: (page = 1, size = 20) => api.get('/admin/orders', { params: { page, size } }),
 }
