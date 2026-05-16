@@ -166,4 +166,32 @@ public class DashboardService {
         }
         return result;
     }
+
+    /** 转化漏斗：注册 → 绑家庭 → 购买 → 持续 */
+    public Map<String, Object> getConversionFunnel() {
+        long registered = userRepo.countByRole(User.UserRole.RESIDENT);
+        long withFamily = userRepo.countWithFamily();
+        long withOrder = orderRepo.countDistinctUserId();
+        Map<String, Object> funnel = new LinkedHashMap<>();
+        funnel.put("registeredUsers", registered);
+        funnel.put("boundFamily", withFamily);
+        funnel.put("purchasedPackage", withOrder);
+        funnel.put("conversionRate", registered > 0 ? Math.round((double) withOrder / registered * 1000) / 10.0 : 0);
+        return funnel;
+    }
+
+    /** 近12个月营收趋势 */
+    public List<Map<String, Object>> getRevenueTrend() {
+        List<Map<String, Object>> trend = new ArrayList<>();
+        for (int i = 11; i >= 0; i--) {
+            LocalDate month = LocalDate.now().minusMonths(i).withDayOfMonth(1);
+            var revenue = orderRepo.sumRevenueSince(month.atStartOfDay());
+            var prevRevenue = orderRepo.sumRevenueBetween(
+                    month.minusMonths(1).atStartOfDay(), month.atStartOfDay());
+            String label = month.getYear() + "-" + String.format("%02d", month.getMonthValue());
+            trend.add(Map.of("month", label, "revenue", revenue != null ? revenue : 0,
+                    "previous", prevRevenue != null ? prevRevenue : 0));
+        }
+        return trend;
+    }
 }

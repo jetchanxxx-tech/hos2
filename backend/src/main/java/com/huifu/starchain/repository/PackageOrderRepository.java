@@ -25,4 +25,10 @@ public interface PackageOrderRepository extends JpaRepository<PackageOrder, Long
 
     @Query("SELECT po.packageId, COUNT(po) as cnt, SUM(po.amount) as revenue FROM PackageOrder po WHERE po.status IN ('PAID', 'ACTIVE') AND po.paidAt >= :since GROUP BY po.packageId ORDER BY cnt DESC")
     List<Object[]> salesRankingSince(LocalDateTime since);
+
+    @Query("SELECT COUNT(DISTINCT po.userId) FROM PackageOrder po WHERE po.status = 'PAID'")
+    long countDistinctUserId();
+
+    @Query("SELECT COALESCE(SUM(po.amount), 0) FROM PackageOrder po WHERE po.status = 'PAID' AND po.paidAt >= :from AND po.paidAt < :to")
+    BigDecimal sumRevenueBetween(LocalDateTime from, LocalDateTime to);
 }

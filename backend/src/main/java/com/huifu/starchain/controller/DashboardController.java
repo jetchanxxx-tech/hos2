@@ -58,4 +58,14 @@ public class DashboardController {
     public ApiResponse<List<Map<String, Object>>> followupByButler() {
         return ApiResponse.ok(dashboardService.getFollowupByButler());
     }
+
+    @GetMapping("/conversion-funnel")
+    public ApiResponse<Map<String, Object>> conversionFunnel() {
+        return ApiResponse.ok(dashboardService.getConversionFunnel());
+    }
+
+    @GetMapping("/revenue-trend")
+    public ApiResponse<List<Map<String, Object>>> revenueTrend() {
+        return ApiResponse.ok(dashboardService.getRevenueTrend());
+    }
 }
