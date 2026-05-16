@@ -18,6 +18,8 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> 
     Page<ChatSession> findByStatusAndEscalationLevelNotOrderByUpdatedAtAsc(String status, String escalationLevel, Pageable pageable);
     List<ChatSession> findByStatusAndIntentType(String status, String intentType);
 
+    Page<ChatSession> findByUserIdAndStatusOrderByCreatedAtDesc(Long userId, String status, Pageable pageable);
+
     @Query("SELECT COALESCE(AVG(cs.satisfactionScore), 0) FROM ChatSession cs WHERE cs.satisfactionScore IS NOT NULL")
     Double avgSatisfaction();
 

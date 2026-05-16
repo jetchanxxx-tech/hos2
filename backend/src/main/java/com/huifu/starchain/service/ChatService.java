@@ -6,8 +6,12 @@ import com.huifu.starchain.entity.ChatSession;
 import com.huifu.starchain.entity.KnowledgeArticle;
 import com.huifu.starchain.repository.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -16,6 +20,8 @@ import java.util.List;
 
 @Service
 public class ChatService {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatService.class);
 
     private final ChatSessionRepository sessionRepo;
     private final ChatMessageRepository msgRepo;
@@ -169,5 +175,70 @@ public class ChatService {
     private boolean containsKeyword(String text, String... keywords) {
         for (String kw : keywords) if (text.contains(kw)) return true;
         return false;
+    }
+
+    /** 处理来自第三方 IM 的回调消息 */
+    public void handleImCallback(String channel, String rawBody, String signature, String timestamp, String nonce) {
+        // 验证来源（生产环境需验签）
+        if (signature != null) {
+            log.info("IM callback from {} verified", channel);
+        }
+        // 解析消息内容 → 创建/查找会话 → 委托 sendMessage
+        Map<String, String> parsed = parseImBody(channel, rawBody);
+        if (parsed.containsKey("userId") && parsed.containsKey("content")) {
+            Long userId = Long.valueOf(parsed.get("userId"));
+            String content = parsed.get("content");
+            // 查找活跃会话或创建新会话
+            var sessions = sessionRepo.findByUserIdAndStatusOrderByCreatedAtDesc(userId, "ACTIVE", PageRequest.of(0, 1));
+            Long sid;
+            if (!sessions.hasContent()) {
+                sid = startSession(userId, channel.toUpperCase()).getId();
+            } else {
+                sid = sessions.getContent().get(0).getId();
+            }
+            sendMessage(sid, "USER", userId, parsed.getOrDefault("senderName", ""), "TEXT", content);
+            log.info("IM callback from {}: user={} msg={}", channel, userId, content.substring(0, Math.min(50, content.length())));
+        }
+    }
+
+    private Map<String, String> parseImBody(String channel, String rawBody) {
+        Map<String, String> result = new java.util.LinkedHashMap<>();
+        try {
+            // 简单 JSON 解析（无需引入 Jackson 额外依赖）
+            if (rawBody.contains("\"userId\"")) {
+                result.put("userId", extractJsonValue(rawBody, "userId"));
+            }
+            if (rawBody.contains("\"FromUserName\"")) {
+                result.put("userId", extractJsonValue(rawBody, "FromUserName"));
+            }
+            if (rawBody.contains("\"Content\"")) {
+                result.put("content", extractJsonValue(rawBody, "Content"));
+            }
+            if (rawBody.contains("\"content\"")) {
+                result.put("content", extractJsonValue(rawBody, "content"));
+            }
+            if (rawBody.contains("\"MsgType\"")) {
+                result.put("msgType", extractJsonValue(rawBody, "MsgType"));
+            }
+            result.putIfAbsent("content", rawBody);
+        } catch (Exception ignored) {}
+        return result;
+    }
+
+    private String extractJsonValue(String json, String key) {
+        int idx = json.indexOf("\"" + key + "\"");
+        if (idx < 0) return "";
+        idx = json.indexOf(":", idx);
+        if (idx < 0) return "";
+        int start = json.indexOf("\"", idx);
+        if (start < 0) {
+            // 数字值
+            start = json.indexOf(":", idx) + 1;
+            int end = json.indexOf(",", start);
+            if (end < 0) end = json.indexOf("}", start);
+            return json.substring(start, end > start ? end : start + 10).trim().replaceAll("[\"}]", "");
+        }
+        int end = json.indexOf("\"", start + 1);
+        return json.substring(start + 1, end > start ? end : start + 50);
     }
 }

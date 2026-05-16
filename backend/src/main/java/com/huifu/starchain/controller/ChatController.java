@@ -77,6 +77,17 @@ public class ChatController {
         return ApiResponse.ok(chatService.getAlerts());
     }
 
+    /** IM 回调入口 — 微信/QQ/飞书消息推送到此 */
+    @PostMapping("/callback/{channel}")
+    public ApiResponse<String> imCallback(
+            @PathVariable String channel, @RequestBody String rawBody,
+            @RequestParam(required = false) String signature,
+            @RequestParam(required = false) String timestamp,
+            @RequestParam(required = false) String nonce) {
+        chatService.handleImCallback(channel, rawBody, signature, timestamp, nonce);
+        return ApiResponse.ok("success");
+    }
+
     // Knowledge Base
     @GetMapping("/knowledge")
     public ApiResponse<PageResult<KnowledgeArticle>> searchKnowledge(
