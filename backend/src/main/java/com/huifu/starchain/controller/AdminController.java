@@ -168,10 +168,44 @@ public class AdminController {
     // ---- Stats ----
     @GetMapping("/stats")
     public ApiResponse<Map<String, Object>> stats() {
+        var complaints = complaintService.listByStatus("PENDING", 1, 1);
+        var complaintsResolved = complaintService.listByStatus("RESOLVED", 1, 1);
         return ApiResponse.ok(Map.of(
                 "totalUsers", userRepo.count(),
                 "activeResidents", userRepo.countByRole(User.UserRole.RESIDENT),
-                "butlers", userRepo.countByRole(User.UserRole.BUTLER_MEDICAL) + userRepo.countByRole(User.UserRole.BUTLER_SERVICE)
+                "butlers", userRepo.countByRole(User.UserRole.BUTLER_MEDICAL) + userRepo.countByRole(User.UserRole.BUTLER_SERVICE),
+                "pendingComplaints", complaints.getTotal(),
+                "resolvedComplaints", complaintsResolved.getTotal()
         ));
+    }
+
+    /** 响应时长统计 */
+    @GetMapping("/response-stats")
+    public ApiResponse<Map<String, Object>> responseStats() {
+        long totalSessions = chatSessionRepo.count();
+        long urgentSessions = chatSessionRepo.findByStatusAndEscalationLevelNotOrderByUpdatedAtAsc(
+                "WAITING_BUTLER", "NONE", PageRequest.of(0, 1)).getTotalElements();
+        double avgSatisfaction = chatSessionRepo.avgSatisfaction();
+        return ApiResponse.ok(Map.of(
+                "totalSessions", totalSessions,
+                "urgentSessions", urgentSessions,
+                "avgSatisfaction", Math.round(avgSatisfaction * 100.0) / 100.0,
+                "complaintResolutionRate", "0%" // TODO: 实现闭环率
+        ));
+    }
+
+    /** CSV 数据导出 */
+    @GetMapping(value = "/export/users", produces = "text/csv;charset=UTF-8")
+    public String exportUsers() {
+        var sb = new StringBuilder("ID,姓名,角色,状态,授权,注册时间\n");
+        for (var u : userRepo.findAll()) {
+            sb.append(u.getId()).append(",")
+              .append(u.getNameMasked()).append(",")
+              .append(u.getRole()).append(",")
+              .append(u.getStatus()).append(",")
+              .append(u.getDataAuthConsent() != null && u.getDataAuthConsent() > 0 ? "已授权" : "未授权").append(",")
+              .append(u.getCreatedAt()).append("\n");
+        }
+        return sb.toString();
     }
 }
