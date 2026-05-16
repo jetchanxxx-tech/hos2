@@ -104,6 +104,21 @@ export const followupApi = {
   butlerTasks: (status?: string, page = 1, size = 20) => api.get('/followups/butler', { params: { status, page, size } }),
   myTasks: (page = 1, size = 20) => api.get('/followups/my', { params: { page, size } }),
   stats: () => api.get('/followups/stats'),
+  create: (data: any) => api.post('/followups', data),
+  assign: (id: number, butlerId: number) => api.put(`/followups/${id}/assign`, null, { params: { butlerId } }),
+  complete: (id: number, note: string) => api.put(`/followups/${id}/complete`, null, { params: { note } }),
+}
+
+export const complaintApi = {
+  list: (status?: string, page = 1, size = 20) => api.get('/admin/complaints', { params: { status, page, size } }),
+  create: (data: any) => api.post('/admin/complaints', data),
+  assign: (id: number, butlerId: number) => api.put(`/admin/complaints/${id}/assign`, null, { params: { butlerId } }),
+  resolve: (id: number, resolution: string) => api.put(`/admin/complaints/${id}/resolve`, { resolution }),
+}
+
+export const pkgOrderApi = {
+  create: (packageId: number) => api.post('/packages/orders', null, { params: { packageId } }),
+  myOrders: (page = 1, size = 20) => api.get('/packages/orders/me', { params: { page, size } }),
 }
 
 // ---- Admin ----

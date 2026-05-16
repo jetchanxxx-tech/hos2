@@ -42,6 +42,12 @@ const router = createRouter({
       meta: { title: '个人资料' },
     },
     {
+      path: '/packages',
+      name: 'PackagePurchase',
+      component: () => import('@/pages/PackagePurchase.vue'),
+      meta: { title: '服务包中心' },
+    },
+    {
       path: '/concentric',
       name: 'FamilyOverview',
       component: () => import('@/pages/concentric/FamilyOverview.vue'),
